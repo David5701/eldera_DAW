@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+/* Eldera - Base Styles */
+:root {
+  /* Colors - Official Eldera Brand palette */
+  --primary: #1E82E5;
+  --primary-dark: #1565C0;
+  --secondary: #00D4C4;
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --error: #ef4444;
+  --success: #00D4C4;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+
+  /* Typography */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+
+  /* Borders */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+
+  /* Application Background Variable - The Source of Truth */
+  --app-bg: #dbeafe;
+  /* matches bg-blue-100 */
+}
+
+/* ... (keep everything else) ... */
+
+/* ===== PRINT STYLES ===== */
+@page {
+  /* margin: 0 removes browser headers/footers AND the white border */
+  margin: 0;
+  size: A4 portrait;
+}
+
+@media print {
+  :root {
+    /* Default to WHITE for printing (Ink Saving) */
+    /* This will be overridden by DynamicLists if PDF mode is active */
+    --app-bg: #ffffff;
+    background-color: var(--app-bg) !important;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 100vh;
+    background-color: var(--app-bg) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    font-size: 11pt;
+  }
+
+  /* We move the visual margin to the main container so the background extends to the edges */
+  main {
+    padding: 15mm !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    background-color: var(--app-bg) !important;
+  }
+
+  /* Ensure shadows don't create artifacts on paper */
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl {
+    box-shadow: none !important;
+  }
+}

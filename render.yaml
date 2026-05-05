@@ -1,0 +1,32 @@
+# Eldera DAW - Render Blueprint (Corrected Spec)
+services:
+  # --- BACKEND (FastAPI con Docker) ---
+  - type: web
+    name: eldera-api-daw
+    runtime: docker
+    dockerfilePath: src/backend/Dockerfile
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: residents
+      - key: SECRET_KEY
+        generateValue: true
+
+  # --- FRONTEND (React Static) ---
+  - type: static
+    name: eldera-web-daw
+    rootDir: src/frontend
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: "dist"
+    envVars:
+      - key: VITE_API_URL
+        value: https://eldera-api-daw.onrender.com
+    routes:
+      - type: rewrite
+        source: "/*"
+        destination: "/index.html"

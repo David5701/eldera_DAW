@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:15
+    container_name: eldera_daw_db          # ← _daw para no colisionar con eldera MVP
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: eldera_daw              # ← base de datos propia del proyecto académico
+    ports:
+      - "5433:5432"                        # ← puerto 5433 en host (MVP usa 5432)
+    volumes:
+      - postgres_daw_data:/var/lib/postgresql/data  # ← volumen separado
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./src/backend/Dockerfile
+    container_name: eldera_daw_backend
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - ./src/backend/.env
+    ports:
+      - "0.0.0.0:8085:8000"                        # ← puerto 8085 en host
+    volumes:
+      - ./src/backend:/app
+
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    container_name: eldera_daw_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "0.0.0.0:5180:5173"                        # ← puerto 5180 en host
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+    # VITE_API_URL eliminada para usar detección dinámica en axios.js y permitir acceso móvil
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: eldera_daw_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@eldera-daw.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5051:80"                          # ← puerto 5051 en host (MVP usa 5050)
+    depends_on:
+      - db
+
+volumes:
+  postgres_daw_data:                       # ← volumen aislado, nunca toca el del MVP
