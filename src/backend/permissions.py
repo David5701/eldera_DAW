@@ -1,5 +1,5 @@
 # Define available roles
-ROLES = ["admin", "director", "nurse", "doctor", "aux", "fisio", "terapeuta", "trabajador_social"]
+ROLES = ["admin", "director", "nurse", "doctor", "aux", "physiotherapist", "occupational_therapist", "social_worker"]
 
 # Permission matrix: action -> list of roles allowed
 PERMISSIONS = {
@@ -11,11 +11,11 @@ PERMISSIONS = {
 
     # View permissions
     "view_resident_basic": ROLES,
-    "view_resident_clinical": ["admin", "director", "nurse", "doctor", "fisio", "terapeuta", "trabajador_social"],
+    "view_resident_clinical": ROLES, # Todos los roles clínicos pueden ver datos clínicos
 
     # Care & Vitals
-    "manage_vitals": ["admin", "director", "nurse", "doctor", "aux", "fisio"],
-    "manage_care": ["admin", "director", "nurse", "doctor", "aux", "fisio", "terapeuta"],
+    "manage_vitals": ["admin", "director", "nurse", "doctor", "aux", "physiotherapist", "occupational_therapist", "social_worker"],
+    "manage_care": ["admin", "director", "nurse", "doctor", "aux", "physiotherapist", "occupational_therapist", "social_worker"],
 
     # Admin actions
     "export_resident": ["admin", "director"],

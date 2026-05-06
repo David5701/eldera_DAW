@@ -35,8 +35,8 @@ echo "🏗️  Ensuring base tables exist from models..."
 python -c "import models, models_extended, database; models.Base.metadata.create_all(bind=database.engine)"
 
 # 3. Synchronize Alembic with current Schema
-# Since we used create_all(), the DB is already at "head" state according to models.
 echo "🏁 Stamping Alembic head..."
+cd src/backend
 alembic stamp head
 
 # 4. Initialize Data & Seed Users (Idempotent)
@@ -45,6 +45,4 @@ python init_db.py
 
 # 5. Start Server
 echo "✅ Initialization complete. Starting Uvicorn on port ${PORT:-8000}..."
-# Use PORT from environment (Render default) or fallback to 8000
-# Remove --reload for production
 exec uvicorn main:app --host 0.0.0.0 --port "${PORT:-8000}"

@@ -103,9 +103,8 @@ router = APIRouter(prefix="/residents", tags=["Residents"])
     response_model=list[schemas_extended.ResidentFollowUpGlobal],
 )
 def get_all_followups(
-    q: Optional[str] = Query(
-        None, description="Término de búsqueda para contenido o residente"
-    ),
+    q: Optional[str] = Query(None, alias="q"),
+    search: Optional[str] = Query(None, alias="search"),
     type: Optional[str] = None,
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
@@ -131,8 +130,9 @@ def get_all_followups(
         models.User, models_extended.ResidentFollowUp.user_id == models.User.id
     )
 
-    if q and q.strip():
-        q_search = f"%{q.strip()}%"
+    q_final = q or search
+    if q_final and q_final.strip():
+        q_search = f"%{q_final.strip()}%"
         # Búsqueda simple compatible con cualquier DB (fallback de unaccent)
         query = query.filter(
             or_(
@@ -255,10 +255,10 @@ def read_residents(
     request: Request = None,
     background_tasks: BackgroundTasks = None,
 ):
-    try:
-        if not permissions.has_permission("view_resident_basic", current_user.role):
-            raise HTTPException(status_code=403, detail="Permiso denegado")
+    if not permissions.has_permission("view_resident_basic", current_user.role):
+        raise HTTPException(status_code=403, detail="Permiso denegado")
 
+    try:
         query = db.query(models.Resident).filter(
             models.Resident.residence_id == current_user.residence_id
         )
@@ -1127,7 +1127,8 @@ async def upload_resident_photo(
 def get_resident_followups(
     resident_id: int,
     silent: Optional[bool] = Query(False, description="Skip audit log"),
-    search: Optional[str] = None,
+    q: Optional[str] = Query(None, alias="q"),
+    search: Optional[str] = Query(None, alias="search"),
     type: Optional[str] = None,
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
@@ -1136,10 +1137,10 @@ def get_resident_followups(
     request: Request = None,
     background_tasks: BackgroundTasks = None,
 ):
-    try:
-        if not permissions.has_permission("view_resident_basic", current_user.role):
-            raise HTTPException(status_code=403, detail="Permiso denegado")
+    if not permissions.has_permission("view_resident_basic", current_user.role):
+        raise HTTPException(status_code=403, detail="Permiso denegado")
 
+    try:
         query = db.query(models_extended.ResidentFollowUp, models.User.username).filter(
             models_extended.ResidentFollowUp.resident_id == resident_id,
             models_extended.ResidentFollowUp.residence_id
@@ -1148,9 +1149,10 @@ def get_resident_followups(
             models.User, models_extended.ResidentFollowUp.user_id == models.User.id
         )
 
-        if search:
+        q_final = q or search
+        if q_final:
             query = query.filter(
-                models_extended.ResidentFollowUp.content.ilike(f"%{search}%")
+                models_extended.ResidentFollowUp.content.ilike(f"%{q_final}%")
             )
 
         if type:

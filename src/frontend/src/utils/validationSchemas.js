@@ -98,24 +98,9 @@ const dniRefinement = (data, ctx) => {
 };
 
 const healthRefinement = (data, ctx) => {
-  // 1. Diabetes Type Required
-  if (data.diagnosis_diabetes && !data.diagnosis_diabetes_type) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Especifique el tipo de diabetes",
-      path: ["diagnosis_diabetes_type"],
-    });
-  }
-
-  // 2. Cancer Type Required
-  if (data.diagnosis_cancer && !data.diagnosis_cancer_type) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Especifique el tipo de cáncer",
-        path: ["diagnosis_cancer_type"],
-      });
-  }
-
+  // Se eliminan las restricciones estrictas de tipo para evitar bloqueos en el formulario
+  // y permitir un registro más ágil según feedback del usuario.
+  
   // 3. Allergy Details Required
   if (data.has_medication_allergy && !data.allergy_medication_detail) {
     ctx.addIssue({

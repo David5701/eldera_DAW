@@ -191,8 +191,11 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
         phone: '',
         email: '',
         family_contacts: [], // Initialize as array to prevent undefined errors
-        admission_date: '',
-        admission_time: '',
+        admission_date: new Date().toLocaleDateString('sv-SE'), // YYYY-MM-DD local
+        admission_time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+        sleep_pattern: 'Normal',
+        sleep_medication: 'No precisa',
+        sleep_observations: '',
 
         // === SISTEMA DE BAJAS ===
         status: 'active',
@@ -316,6 +319,8 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
 
         // === SUEÑO ===
         sleep_medication: '',
+        sleep_pattern: '',
+        sleep_observations: '',
 
         // === VACUNACIÓN ===
         vaccine_flu_last: '',
@@ -1326,7 +1331,7 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                                     value={formData.admission_date || new Date().toISOString().split('T')[0]}
                                     onChange={handleChange}
                                     required
-                                    max="2099-12-31" // Explicitly allow future dates
+                                    max="2099-12-31" // Permitir fechas futuras y evitar bloqueos por zona horaria
                                     className="w-full px-4 py-3 bg-white border border-[#1E82E5]/30 rounded-xl focus:ring-2 focus:ring-[#1E82E5] font-medium outline-none"
                                 />
                             </div>

@@ -6,39 +6,37 @@ Eldera es una plataforma avanzada de gestión clínica y administrativa diseñad
 
 El sistema se fundamenta en tres pilares de ingeniería:
 
-1.  **Lógica de Negocio Soberana**: Implementación de una Arquitectura Hexagonal que aisla las reglas clínicas de la infraestructura, facilitando la testabilidad y el mantenimiento a largo plazo.
-2.  **Seguridad "Zero Footprint" (BYOD)**: Diseñado para dispositivos personales. Los datos de salud (PHI) residen exclusivamente en memoria volátil (RAM), sin persistencia en el dispositivo cliente, garantizando el cumplimiento normativo en entornos de movilidad.
-3.  **Contexto por Rol**: La interfaz se adapta dinámicamente al perfil del profesional (Enfermería, Medicina, Fisioterapia, etc.), optimizando los flujos de trabajo y minimizando la posibilidad de error humano.
+1.  **Lógica de Negocio Soberana**: Implementación de una Arquitectura Hexagonal que aisla las reglas clínicas de la infraestructura.
+2.  **Seguridad "Zero Footprint" (BYOD)**: Los datos de salud (PHI) residen exclusivamente en memoria volátil (RAM), sin persistencia en el dispositivo cliente.
+3.  **Contexto por Rol**: La interfaz se adapta dinámicamente al perfil del profesional (Enfermería, Medicina, Fisioterapia, etc.).
 
 ## 🛠️ Stack Tecnológico
 
-Eldera utiliza un conjunto de tecnologías modernas seleccionadas por su robustez y rendimiento:
-
-*   **Frontend**: SPA desarrollada con **React 19**, utilizando **Vite** para la compilación y **Tailwind CSS** para un diseño responsivo y premium.
-*   **Backend**: API asíncrona de alto rendimiento construida con **FastAPI** (Python 3.11+).
-*   **Persistencia**: **PostgreSQL 15** con integridad referencial estricta y arquitectura multi-tenant nativa.
-*   **Seguridad**: Protocolo **OAuth2** con Bearer Tokens (JWT) y cifrado de alta seguridad.
-*   **Infraestructura**: Contenerización completa mediante **Docker** y orquestación con **Docker Compose**.
+*   **Frontend**: SPA desarrollada con **React 19**, utilizando **Vite** y **Tailwind CSS**.
+*   **Backend**: API asíncrona construida con **FastAPI** (Python 3.11+) y **uv** para la gestión de dependencias.
+*   **Persistencia**: **PostgreSQL 15** con arquitectura multi-tenant nativa.
+*   **Infraestructura**: Contenerización completa mediante **Docker** y **Docker Compose**.
 
 ## 📁 Estructura del Proyecto
 
 ```text
-eldera/
+eldera-daw/
 ├── src/
-│   ├── backend/          # API FastAPI, esquemas Pydantic y lógica ORM
-│   │   ├── models.py     # Modelos de datos de residentes y clínica
-│   │   ├── routers/      # Endpoints organizados por módulos
-│   │   └── main.py       # Punto de entrada y middlewares de seguridad
-│   └── frontend/         # Interfaz de usuario React
-│       ├── src/pages/    # Vistas principales del sistema
-│       └── src/components/# Componentes reutilizables y formularios
-├── docker-compose.yml    # Orquestación de servicios
-└── pyproject.toml        # Gestión de dependencias y calidad (Ruff)
+│   ├── backend/             # Lógica API (FastAPI)
+│   │   ├── alembic/         # Migraciones de base de datos
+│   │   ├── routers/         # Endpoints por módulo
+│   │   ├── models.py        # Esquemas base (SQLAlchemy)
+│   │   ├── models_extended.py # Extensiones de modelos clínicos
+│   │   ├── schemas_extended.py # Validaciones Pydantic avanzadas
+│   │   ├── init_db.py       # Script de inicialización y semillas
+│   │   └── main.py          # Punto de entrada de la aplicación
+│   └── frontend/            # Interfaz de usuario (React)
+├── docker-compose.yml       # Orquestación de servicios
+├── pyproject.toml           # Gestión de dependencias y calidad (Ruff)
+└── uv.lock                  # Lockfile de dependencias ultra-rápido
 ```
 
 ## 🚀 Instalación y Despliegue
-
-La plataforma está diseñada para ser desplegada en segundos en cualquier entorno compatible con Docker.
 
 ### 1. Despliegue de Servicios
 ```bash
@@ -47,21 +45,20 @@ docker-compose up -d --build
 ```
 
 ### 2. Inicialización de la Base de Datos
+Es fundamental ejecutar la inicialización para cargar los datos maestros y usuarios de prueba:
 ```bash
 # Crear esquema y cargar datos maestros/semilla
-docker exec eldera_backend python init_db.py
+docker exec -it eldera_daw_backend python src/backend/init_db.py
 ```
 
 ## 📋 Requisitos del Sistema
 *   Docker Engine 20.10+
 *   Docker Compose v2.0+
-*   8GB RAM Recomendados para el stack completo
+*   8GB RAM Recomendados
 
 ## 💻 Acceso al Sistema
-Una vez iniciado, el sistema es accesible en las siguientes direcciones:
-
 *   **Interfaz de Usuario**: [http://localhost:5180](http://localhost:5180)
-*   **Documentación API**: [http://localhost:8000/docs](http://localhost:8000/docs)
+*   **Documentación API**: [http://localhost:8085/docs](http://localhost:8085/docs)
 
 ### Credenciales de Acceso (Desarrollo)
 | Usuario | Contraseña | Perfil |
@@ -70,10 +67,10 @@ Una vez iniciado, el sistema es accesible en las siguientes direcciones:
 | `nurse` | `nurse123` | Enfermería |
 | `director` | `director123` | Dirección |
 
-## 🛡️ Calidad de Código y Mantenimiento
-Eldera utiliza **Ruff** para garantizar la consistencia del código y **Pytest** para la validación de la lógica clínica. Para asegurar la integridad del sistema antes de cada despliegue, se recomienda ejecutar:
+## 🛡️ Calidad de Código
+El proyecto utiliza **Ruff** para linting y **Pytest** para pruebas:
 ```bash
-docker exec eldera_backend pytest
+docker exec -it eldera_daw_backend pytest
 ```
 
 ---

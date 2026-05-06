@@ -1329,7 +1329,7 @@ export const SleepSection = ({ formData, handleChange }) => {
                         onChange={handleChange}
                         className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-indigo-500 focus:border-blue-500"
                     >
-                        <option value="">No precisa</option>
+                        <option value="No precisa">No precisa</option>
                         <option value="Zolpidem">Zolpidem</option>
                         <option value="Lorazepam">Lorazepam</option>
                         <option value="Diazepam">Diazepam</option>
@@ -1337,6 +1337,22 @@ export const SleepSection = ({ formData, handleChange }) => {
                         <option value="Mirtazapina">Mirtazapina</option>
                         <option value="Melatonina">Melatonina</option>
                         <option value="Otros">Otros</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Patrón de Sueño</label>
+                    <select
+                        name="sleep_pattern"
+                        value={formData.sleep_pattern || ''}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-indigo-500 focus:border-blue-500"
+                    >
+                        <option value="Normal">Sueño reparador (Normal)</option>
+                        <option value="Insomnio Conciliación">Insomnio de conciliación</option>
+                        <option value="Insomnio Mantenimiento">Insomnio de mantenimiento</option>
+                        <option value="Despertar Precoz">Despertar precoz</option>
+                        <option value="Inversión Ritmo">Inversión del ritmo</option>
+                        <option value="Somnolencia Diurna">Somnolencia diurna excesiva</option>
                     </select>
                 </div>
                 <div>

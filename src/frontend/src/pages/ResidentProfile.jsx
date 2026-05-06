@@ -813,16 +813,16 @@ function EliminationDetail({ resident }) {
                         <Droplet className="w-5 h-5 text-amber-500" /> Eliminación Urinaria
                     </h3>
                     <div className="space-y-3">
-                        <InfoRow label="Incontinencia" value={resident.urinary_incontinence ? 'Sí' : 'No'} />
+                        <InfoRow label="Incontinencia" value={t(resident.urinary_incontinence)} />
                         {resident.urinary_incontinence && (
                             <>
                                 <InfoRow label="Tipo" value={t(resident.incontinence_type)} />
                                 <InfoRow label="Frecuencia / Día" value={t(resident.urinary_incontinence_frequency)} />
-                                <InfoRow label="Incontinencia Nocturna" value={resident.night_incontinence ? 'SÍ' : 'NO'} />
+                                <InfoRow label="Incontinencia Nocturna" value={t(resident.night_incontinence)} />
                             </>
                         )}
                         <div className="mt-2 pt-2 border-t border-amber-200/50">
-                            <InfoRow label="Sonda Vesical" value={resident.device_catheter ? 'Sí' : 'No'} />
+                            <InfoRow label="Sonda Vesical" value={t(resident.device_catheter)} />
                             {resident.device_catheter && resident.device_invasive_type && (
                                 <p className="text-[10px] text-amber-700 font-bold uppercase mt-1 ml-auto text-right italic">
                                     {resident.device_invasive_type}
@@ -837,12 +837,12 @@ function EliminationDetail({ resident }) {
                         <Wind className="w-5 h-5 text-amber-600" /> Eliminación Fecal
                     </h3>
                     <div className="space-y-3">
-                        <InfoRow label="Incontinencia" value={resident.fecal_incontinence ? 'Sí' : 'No'} />
+                        <InfoRow label="Incontinencia" value={t(resident.fecal_incontinence)} />
                         {resident.fecal_incontinence && (
                             <InfoRow label="Frecuencia / Día" value={t(resident.fecal_incontinence_frequency)} />
                         )}
                         <div className="mt-2 pt-2 border-t border-amber-200/50">
-                            <InfoRow label="Ostomía (PEG/Estoma)" value={resident.device_peg ? 'Sí' : 'No'} />
+                            <InfoRow label="Ostomía (PEG/Estoma)" value={t(resident.device_peg)} />
                         </div>
                     </div>
                 </div>
@@ -853,7 +853,7 @@ function EliminationDetail({ resident }) {
                     <Droplet className="w-5 h-5 text-amber-600 opacity-70" /> Pañales y Absorbentes
                 </h3>
                 <div className="space-y-3">
-                    <InfoRow label="Uso de Pañales" value={resident.diaper_use ? 'Sí' : 'No'} />
+                    <InfoRow label="Uso de Pañales" value={t(resident.diaper_use)} />
                     {resident.diaper_use && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
                             <InfoRow label="Tipo" value={
@@ -952,7 +952,7 @@ function StressDetail({ resident }) {
                 <Shield className="w-5 h-5" /> Sujeciones y Conductas
             </h4>
             <div className="space-y-3">
-                <InfoRow label="Requiere Sujeción" value={resident.requires_restraint ? 'Sí' : 'No'} />
+                <InfoRow label="Requiere Sujeción" value={t(resident.requires_restraint)} />
                 {resident.requires_restraint && (
                     <>
                         {resident.restraint_type && <InfoRow label="Tipo" value={resident.restraint_type} />}
@@ -966,7 +966,7 @@ function StressDetail({ resident }) {
                         {resident.restraint_authorization_date && (
                             <InfoRow label="Fecha Autorización" value={new Date(resident.restraint_authorization_date).toLocaleDateString()} />
                         )}
-                        <InfoRow label="Hoja de Seguridad" value={resident.restraint_safety_sheet ? 'Cumplimentada' : 'Pendiente'} />
+                        <InfoRow label="Hoja de Seguridad" value={t(resident.restraint_safety_sheet)} />
                     </>
                 )}
             </div>
@@ -996,7 +996,7 @@ function ValuesDetail({ resident }) {
         <div className="bg-teal-50 p-6 rounded-2xl border border-teal-100">
             <h4 className="font-bold text-teal-900 mb-4">Consentimientos</h4>
             <div className="space-y-3">
-                <InfoRow label="Consentimiento Informado" value={resident.consent_informed ? 'Sí' : 'No'} />
+                <InfoRow label="Consentimiento Informado" value={t(resident.consent_informed)} />
                 {resident.consent_informed_date && (
                     <InfoRow label="Fecha" value={new Date(resident.consent_informed_date).toLocaleDateString()} />
                 )}
@@ -1011,7 +1011,7 @@ function ValuesDetail({ resident }) {
                 <div className="space-y-3">
                     <InfoRow label="Tipo de Sujeción" value={resident.restraint_type || '--'} />
                     <InfoRow label="Horario / Pauta" value={resident.restraint_schedule || '--'} />
-                    <InfoRow label="Hoja de Seguridad" value={resident.restraint_safety_sheet ? 'Sí' : 'No'} />
+                    <InfoRow label="Hoja de Seguridad" value={t(resident.restraint_safety_sheet)} />
                     <InfoRow label="Fecha Autorización" value={resident.restraint_authorization_date ? new Date(resident.restraint_authorization_date).toLocaleDateString() : '--'} />
                     <div>
                         <p className="text-xs font-bold text-rose-700 uppercase mb-1">Justificación Médica</p>
@@ -1123,10 +1123,10 @@ function PhysioDetail({ resident }) {
                         <Activity className="w-5 h-5" /> Dispositivos Invasivos
                     </h3>
                     <div className="space-y-3">
-                        <InfoRow label="PEG / Gastrostomía" value={resident.device_peg ? 'SÍ' : 'No'} />
-                        <InfoRow label="Sonda Nasogástrica" value={resident.device_nasogastric ? 'SÍ' : 'No'} />
-                        <InfoRow label="Traqueostomía" value={resident.device_tracheostomy ? 'SÍ' : 'No'} />
-                        <InfoRow label="VEIS (Subcutánea)" value={resident.device_veis ? 'SÍ' : 'No'} />
+                        <InfoRow label="PEG / Gastrostomía" value={t(resident.device_peg)} />
+                        <InfoRow label="Sonda Nasogástrica" value={t(resident.device_nasogastric)} />
+                        <InfoRow label="Traqueostomía" value={t(resident.device_tracheostomy)} />
+                        <InfoRow label="VEIS (Subcutánea)" value={t(resident.device_veis)} />
                         {resident.device_invasive_change_date && (
                             <div className="mt-3 p-3 bg-white rounded-xl border border-rose-200">
                                 <p className="text-[10px] font-black text-rose-800 uppercase mb-1">Próximo Cambio / Revisión</p>
@@ -1246,7 +1246,7 @@ function SocialDetail({ resident }) {
                 )}
 
                 <div className="bg-white p-4 rounded-xl border border-slate-200">
-                    <InfoRow label="Sobrecarga del Cuidador" value={resident.caregiver_burden ? 'Sí' : 'No'} />
+                    <InfoRow label="Sobrecarga del Cuidador" value={t(resident.caregiver_burden)} />
                 </div>
             </div>
         </div>
@@ -1317,7 +1317,7 @@ function NutritionDetail({ resident }) {
                             label="Viscosidad Bebida"
                             value={resident.diet_texture || 'Líquida'}
                         />
-                        <InfoRow label="Disfagia" value={resident.dysphagia ? 'Sí' : 'No'} />
+                        <InfoRow label="Disfagia" value={t(resident.dysphagia)} />
                         {resident.dysphagia && (
                             <div className="mt-2 p-3 bg-green-50 rounded-lg border border-green-200">
                                 {resident.dysphagia_grade && (
@@ -1335,7 +1335,7 @@ function NutritionDetail({ resident }) {
                             label="Alergias Alimentarias"
                             value={resident.has_food_allergy ? (
                                 <span className="text-rose-600 font-bold"> Sí {resident.allergy_food_detail ? `(${resident.allergy_food_detail})` : ''}</span>
-                            ) : 'No'}
+                            ) : t(false)}
                         />
                     </div>
                 </div>
@@ -1363,7 +1363,7 @@ function NutritionDetail({ resident }) {
                         </div>
                     </div>
                     <div className="space-y-3 bg-white p-4 rounded-xl border border-emerald-100">
-                        <InfoRow label="Prótesis Dental" value={resident.device_dentures ? 'SÍ' : 'No'} />
+                        <InfoRow label="Prótesis Dental" value={t(resident.device_dentures)} />
                         {resident.device_dentures && resident.device_dentures_type && (
                             <p className="text-xs text-slate-500 ml-7">
                                 Tipo: <span className="font-bold text-slate-700">{resident.device_dentures_type}</span>
@@ -1408,10 +1408,30 @@ function SleepDetail({ resident }) {
     <div className="space-y-6">
 
         <div className="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 space-y-4">
+            {resident.sleep_medication && (
+                <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-indigo-100 shadow-sm">
+                    <Moon className="w-5 h-5 text-indigo-500" />
+                    <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Medicación</p>
+                        <p className="text-sm font-bold text-slate-700">{resident.sleep_medication}</p>
+                    </div>
+                </div>
+            )}
+            {resident.sleep_pattern && (
+                <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-indigo-100 shadow-sm">
+                    <Clock className="w-5 h-5 text-indigo-500" />
+                    <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Patrón</p>
+                        <p className="text-sm font-bold text-slate-700">{resident.sleep_pattern}</p>
+                    </div>
+                </div>
+            )}
             {resident.sleep_observations && (
-                <div>
-                    <h4 className="font-bold text-slate-700 mb-2">Observaciones</h4>
-                    <p className="text-slate-600 text-sm">{resident.sleep_observations}</p>
+                <div className="p-4 bg-white rounded-xl border border-indigo-100 shadow-sm">
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                        <FileText className="w-3 h-3" /> Observaciones
+                    </h4>
+                    <p className="text-sm text-slate-600 font-medium leading-relaxed">{resident.sleep_observations}</p>
                 </div>
             )}
             {!resident.sleep_medication && !resident.sleep_pattern && !resident.sleep_observations && (
@@ -1435,10 +1455,10 @@ function PsychDetail({ resident }) {
                         <Brain className="w-5 h-5 text-purple-500" /> Estado Cognitivo
                     </h3>
                     <div className="space-y-3">
-                        <InfoRow label="Deterioro Cognitivo" value={t(resident.cognitive_impairment) || 'Sin valorar'} />
+                        <InfoRow label="Deterioro Cognitivo" value={t(resident.cognitive_impairment)} />
                         <InfoRow label="MMSE (Folstein)" value={resident.mmse_score ? `${resident.mmse_score}/30` : '--'} />
                         <InfoRow label="Pfeiffer" value={resident.pfeiffer_score ? `${resident.pfeiffer_score} errores` : '--'} />
-                        <InfoRow label="Usa Psicofármacos" value={resident.uses_psychotropics ? 'Sí' : 'No'} />
+                        <InfoRow label="Usa Psicofármacos" value={t(resident.uses_psychotropics)} />
                     </div>
                 </div>
 

@@ -24,8 +24,10 @@ if SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgres://")
 connect_args = {}
 db_url_lower = SQLALCHEMY_DATABASE_URL.lower()
 
-# Forzar SSL si no es localhost
-if "localhost" not in db_url_lower and "127.0.0.1" not in db_url_lower:
+# Forzar SSL solo para bases de datos externas (nube)
+# No aplicamos SSL a localhost, 127.0.0.1 ni al host interno 'db' de Docker
+internal_hosts = ["localhost", "127.0.0.1", "db", "postgres"]
+if not any(host in db_url_lower for host in internal_hosts):
     connect_args["sslmode"] = "require"
 
 engine = create_engine(

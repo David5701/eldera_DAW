@@ -25,7 +25,7 @@ services:
     ports:
       - "0.0.0.0:8085:8000"                        # ← puerto 8085 en host
     volumes:
-      - ./src/backend:/app
+      - .:/app
 
   frontend:
     build:

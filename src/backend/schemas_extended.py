@@ -20,16 +20,16 @@ class ResidentValidatorMixin:
     @model_validator(mode="before")
     @classmethod
     def sanitize_empty_strings(cls, data: Any) -> Any:
-        """Convierte strings vacíos, 'null' o 'None' a None para evitar errores de patrón"""
-        bad_values = ["", "null", "None", "NULL", "none"]
+        """Convierte strings vacíos, 'null' o 'None' a None para evitar errores de validación de tipo."""
+        bad_values = ["", "null", "None", "NULL", "none", "undefined"]
         
         if isinstance(data, dict):
-            for key, value in data.items():
+            new_data = data.copy()
+            for key, value in new_data.items():
                 if isinstance(value, str) and value.strip() in bad_values:
-                    data[key] = None
+                    new_data[key] = None
+            return new_data
         elif hasattr(data, "__dict__"):
-            # This is an object (from DB). We don't want to modify the DB object here,
-            # but we can return a DICT with the sanitized values so Pydantic uses that.
             sanitized = {}
             for key, value in data.__dict__.items():
                 if key.startswith('_'): continue
@@ -39,6 +39,21 @@ class ResidentValidatorMixin:
                     sanitized[key] = value
             return sanitized
         return data
+
+    @field_validator(
+        "admission_date", 
+        "date_of_birth", 
+        "inactive_date", 
+        "return_date", 
+        "hospitalization_date", 
+        "hospitalization_end_date", 
+        mode="after", 
+        check_fields=False
+    )
+    @classmethod
+    def validate_dates_lenient(cls, v: Any) -> Any:
+        """Asegura que las fechas sean procesadas sin restricciones estrictas de pasado/futuro."""
+        return v
 
     @field_validator("name", "surname", mode="after", check_fields=False)
     @classmethod
@@ -158,20 +173,9 @@ class ResidentValidatorMixin:
 
     @model_validator(mode="after")
     def check_conditional_fields_extended(self) -> Any:
-        """Valida coherencia de campos dependientes adicionales (solo si existen)"""
-        # Verificamos existencia de campos en la definición del modelo Pydantic
-        # para evitar AttributeErrors en modelos que heredan este mixin pero no tienen estos campos
-        fields = self.model_fields
-        has_diabetes = "diagnosis_diabetes" in fields
-        has_cancer = "diagnosis_cancer" in fields
-        
-        if has_diabetes and getattr(self, "diagnosis_diabetes", False):
-             # Solo validar si se está intentando poner a True en este payload
-             if not getattr(self, "diagnosis_diabetes_type", None):
-                raise ValueError("Debe especificar el tipo de diabetes (1 o 2)")
-        if has_cancer and getattr(self, "diagnosis_cancer", False):
-            if not getattr(self, "diagnosis_cancer_type", None):
-                raise ValueError("Debe especificar el tipo de cáncer")
+        """Valida coherencia de campos dependientes adicionales (lenient)"""
+        # Se eliminan las restricciones estrictas de tipo para evitar errores 422
+        # y permitir un registro más ágil según feedback del usuario.
         return self
 
 
@@ -307,7 +311,11 @@ class ResidentBaseExtended(BaseModel, ResidentValidatorMixin):
 
 
     # Nutrición
-    # diet_type: Optional[str] = None # DEPRECATED
+    diet_normal: bool = False
+    diet_diabetic: bool = False
+    diet_low_salt: bool = False
+    diet_astringent: bool = False
+    diet_protection: bool = False
     diet_soft: bool = False
     diet_pureed: bool = False
     diet_liquid: bool = False
@@ -353,6 +361,8 @@ class ResidentBaseExtended(BaseModel, ResidentValidatorMixin):
     behavior_night_wandering: bool = False
     uses_psychotropics: bool = False
     sleep_medication: Optional[str] = None
+    sleep_pattern: Optional[str] = None
+    sleep_observations: Optional[str] = None
 
     # Vacunación
     vaccine_flu_last: Optional[date] = None
@@ -636,6 +646,8 @@ class ResidentUpdateExtended(BaseModel, ResidentValidatorMixin):
     behavior_night_wandering: Optional[bool] = None
     uses_psychotropics: Optional[bool] = None
     sleep_medication: Optional[str] = None
+    sleep_pattern: Optional[str] = None
+    sleep_observations: Optional[str] = None
 
     # Vaccines
     vaccine_flu_last: Optional[date] = None

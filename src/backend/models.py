@@ -327,8 +327,10 @@ class Resident(Base):
     # === NUEVOS CAMPOS (FEEDBACK USUARIO) ===
     # Lista de contactos familiares: [{name, relation, phone}, ...]
     family_contacts = Column(JSON_TYPE, nullable=True)
-    # Medicación para dormir
+    # Medicación y patrón de sueño
     sleep_medication = Column(String, nullable=True)
+    sleep_pattern = Column(String, nullable=True)
+    sleep_observations = Column(Text, nullable=True)
 
     # === METADATOS ===
     created_at = Column(DateTime, default=datetime.utcnow)

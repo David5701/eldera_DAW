@@ -1,31 +1,37 @@
 FROM python:3.11-slim
 
+# Evitar la creación de archivos .pyc y habilitar log sin buffer
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+# PYTHONPATH asegura que las importaciones funcionen desde la raíz
+# Añadimos la raíz y el directorio backend para máxima compatibilidad
+ENV PYTHONPATH=/app:/app/src/backend
+
 WORKDIR /app
 
-# Install system dependencies
+# Instalar dependencias del sistema necesarias
 RUN apt-get update && apt-get install -y \
-    tzdata \
-    libpq5 \
     curl \
+    libpq-dev \
+    gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Install uv
+# Instalar uv para una gestión de dependencias ultra-rápida
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Use uv to install dependencies
+# Instalar dependencias usando pyproject.toml
+# Copiamos solo los archivos de configuración primero para aprovechar la caché de capas
 COPY pyproject.toml uv.lock ./
-RUN uv pip install --system .
+RUN uv pip install --system --no-cache .
 
-# Copy backend source code
-COPY src/backend /app
+# Copiar el resto del código fuente
+COPY . .
 
-# Ensure we're in the right directory for CMD
-WORKDIR /app
-
-# Auto-migrate DB on startup (Robust Mode via script)
-COPY src/backend/start.sh /start.sh
-RUN chmod +x /start.sh
+# Asegurar permisos de ejecución para el script de inicio
+RUN chmod +x src/backend/start.sh
 
 EXPOSE 8000
 
-CMD ["/start.sh"]
+# El comando se ejecuta desde la raíz (WORKDIR /app)
+# Esto permite que 'docker exec ... python src/backend/init_db.py' funcione correctamente
+CMD ["./src/backend/start.sh"]
