@@ -51,6 +51,20 @@ Es fundamental ejecutar la inicialización para cargar los datos maestros y usua
 docker exec -it eldera_daw_backend python src/backend/init_db.py
 ```
 
+## 🌐 Despliegue Cloud (Render)
+
+El proyecto está preparado para el despliegue automático en **Render** mediante el archivo `render.yaml` (Blueprint).
+
+### Componentes en Render:
+- **API (Backend)**: Desplegado como servicio web Docker (`src/backend/Dockerfile`).
+- **Web (Frontend)**: Desplegado como sitio estático (`src/frontend`).
+
+### Configuración Necesaria:
+Es obligatorio configurar las siguientes variables de entorno en el panel de Render:
+- `DATABASE_URL`: Conexión a PostgreSQL (Render DB o externa).
+- `SECRET_KEY`: Cadena aleatoria para seguridad de tokens.
+- `FORCE_RESET`: Debe estar en `false` para evitar borrado de datos en cada despliegue.
+
 ## 📋 Requisitos del Sistema
 *   Docker Engine 20.10+
 *   Docker Compose v2.0+
@@ -64,8 +78,11 @@ docker exec -it eldera_daw_backend python src/backend/init_db.py
 | Usuario | Contraseña | Perfil |
 |---------|------------|--------|
 | `admin` | `admin123` | Administrador |
-| `nurse` | `nurse123` | Enfermería |
-| `director` | `director123` | Dirección |
+| `director1` | `director123` | Dirección |
+| `nurse1` | `nurse123` | Enfermería |
+| `doctor_test` | `eldera2024` | Medicina |
+| `social_test` | `eldera2024` | Trabajo Social |
+| `physio_test` | `eldera2024` | Fisioterapia |
 
 ## 🛡️ Calidad de Código
 El proyecto utiliza **Ruff** para linting y **Pytest** para pruebas:
