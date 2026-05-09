@@ -263,15 +263,15 @@ function HealthDetail({ groupedVitals, onRefresh, startDate, endDate, onStartCha
         const cls = colorClasses[color] || colorClasses.indigo;
 
         return (
-            <div className={`bg-white rounded-[2rem] border border-slate-100 shadow-sm flex flex-col h-[500px] overflow-hidden animate-in fade-in slide-in-from-bottom-4`}>
-                <div className={`p-6 border-b ${cls.border} flex items-center justify-between ${cls.bg}`}>
-                    <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${cls.iconBg} shadow-sm`}>
-                            <Icon size={20} />
+            <div className={`bg-white rounded-[2rem] border border-slate-100 shadow-sm flex flex-col h-auto min-h-[150px] max-h-[400px] md:max-h-[500px] overflow-hidden animate-in fade-in slide-in-from-bottom-4`}>
+                <div className={`p-4 md:p-6 border-b ${cls.border} flex items-center justify-between gap-2 ${cls.bg}`}>
+                    <div className="flex items-center gap-2 overflow-hidden">
+                        <div className={`w-8 h-8 md:w-10 md:h-10 shrink-0 rounded-xl md:rounded-2xl flex items-center justify-center ${cls.iconBg} shadow-sm`}>
+                            <Icon size={18} />
                         </div>
-                        <h3 className={`text-lg font-black ${cls.text} uppercase tracking-tight`}>{title}</h3>
+                        <h3 className={`text-xs sm:text-sm md:text-base font-black ${cls.text} uppercase tracking-tight truncate`}>{title}</h3>
                     </div>
-                    <span className={`text-[10px] font-black px-2 py-1 bg-white rounded-lg ${cls.text} border ${cls.border} uppercase shadow-sm`}>{unit}</span>
+                    <span className={`shrink-0 text-[9px] md:text-[10px] font-black px-2 py-1 bg-white rounded-lg ${cls.text} border ${cls.border} uppercase shadow-sm`}>{unit}</span>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
                     {filtered.length > 0 ? (
@@ -360,12 +360,12 @@ function CareDetail({ groupedCare }) {
                 </div>
             ) : (
                 categories.map(cat => (
-                    <div key={cat.id} className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[500px] hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500">
-                        <div className={`p-6 border-b ${cat.style.border} ${cat.style.bg} flex items-center gap-4`}>
-                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${cat.style.iconBg} shadow-sm`}>
-                                <cat.style.icon size={24} />
+                    <div key={cat.id} className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col h-auto min-h-[150px] max-h-[400px] md:max-h-[500px] hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500">
+                        <div className={`p-4 md:p-6 border-b ${cat.style.border} ${cat.style.bg} flex items-center gap-3 md:gap-4 overflow-hidden`}>
+                            <div className={`w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-2xl flex items-center justify-center ${cat.style.iconBg} shadow-sm`}>
+                                <cat.style.icon size={20} className="md:w-6 md:h-6" />
                             </div>
-                            <h3 className={`text-lg font-black ${cat.style.color} tracking-tight`}>{cat.label}</h3>
+                            <h3 className={`text-sm sm:text-base md:text-lg font-black ${cat.style.color} tracking-tight truncate`}>{cat.label}</h3>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">

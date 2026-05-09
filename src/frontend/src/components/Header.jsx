@@ -8,7 +8,7 @@ export default function Header({ onMenuClick, extraContent }) {
     const [showUserMenu, setShowUserMenu] = useState(false);
 
     return (
-        <header className="sticky top-2 z-30 bg-[#1E82E5] border border-blue-400/20 min-h-16 py-2 shadow-lg shadow-blue-900/10 rounded-2xl mx-2 print:hidden transition-all duration-200">
+        <header className="sticky top-2 z-50 bg-[#1E82E5] border border-blue-400/20 min-h-16 py-2 shadow-lg shadow-blue-900/10 rounded-2xl mx-2 print:hidden transition-all duration-200">
             <div className="px-4 md:px-8 flex items-center justify-between gap-4">
                 {/* Left: Menu Button (Mobile) & Title/Breadcrumbs */}
                 <div className="flex items-center gap-4 shrink-0">
