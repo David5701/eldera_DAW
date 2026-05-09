@@ -15,6 +15,10 @@ El sistema se fundamenta en tres pilares de ingeniería:
 *   **Perfil Integral del Residente**: Gestión bio-psico-social estructurada en los 11 Patrones Funcionales de Salud de Marjory Gordon.
 *   **Módulo Quick Care**: Interfaz ágil para el registro en tiempo real de constantes vitales y cuidados diarios.
 *   **Control de Acceso (RBAC) Granular**: Visualización colaborativa de datos y restricción de edición basada en competencias.
+*   **Seguimientos**: Seguimientos completos de los residentes.
+*   **Registro de Ingresos, Bajas y Hospitalizaciones**: Registro completo de los ingresos, bajas y hospitalizaciones de los residentes.
+*  **Listados dinamicos**: Listados dinamicos de los residentes.
+
 
 ## 🛠️ Stack Tecnológico
 
@@ -101,7 +105,6 @@ El acceso a las funcionalidades clínicas está estrictamente regulado según el
 |--------|:---------------:|:-------------------:|:----------:|:--------------------------:|
 | **Registro de Constantes** | ✅ | ✅ | ❌ | ❌ |
 | **Registro de Cuidados** | ✅ | ✅ | ✅ | ❌ |
-| **Perfil: Datos Base / Pautas** | ✅ | ✅ | ❌ | ❌ |
 | **Perfil: Patrones Funcionales**| ✅ | ✅ | ⚠️ (Limitado) | ⚠️ (Secciones específicas) |
 | **Exportación PDF/Datos** | ✅ | ❌ | ❌ | ❌ |
 
