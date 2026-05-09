@@ -56,12 +56,18 @@ export default function Header({ onMenuClick, extraContent }) {
                                     {user?.name || user?.username || 'Usuario'}
                                 </p>
                                 <p className="text-xs text-blue-100 font-bold tracking-widest uppercase opacity-90">
-                                    {user?.role === 'admin' ? 'Administrador' : 
-                                     user?.role === 'nurse' ? 'Enfermería' : 
-                                     user?.role === 'aux' ? 'Auxiliar' : 
-                                     user?.role === 'doctor' ? 'Médico' :
-                                     user?.role === 'director' ? 'Director' :
-                                     user?.role || 'Personal'}
+                                    {(() => {
+                                        const role = (user?.role || '').toLowerCase().trim();
+                                        return role === 'admin' ? 'Administrador' : 
+                                               role === 'nurse' ? 'Enfermería' : 
+                                               role === 'aux' ? 'Auxiliar' : 
+                                               role === 'doctor' ? 'Médico' :
+                                               role === 'director' ? 'Director' :
+                                               role === 'social_worker' ? 'Trabajo Social' :
+                                               role === 'physiotherapist' ? 'Fisioterapia' :
+                                               role === 'occupational_therapist' ? 'Terapia Ocupacional' :
+                                               user?.role || 'Personal';
+                                    })()}
                                 </p>
                             </div>
                             <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-blue-500 border-2 border-blue-400 flex items-center justify-center text-white font-black shadow-sm shrink-0">
@@ -85,6 +91,10 @@ export default function Header({ onMenuClick, extraContent }) {
                                              user?.role === 'nurse' ? 'Enfermería' : 
                                              user?.role === 'aux' ? 'Auxiliar' : 
                                              user?.role === 'doctor' ? 'Médico' :
+                                             user?.role === 'director' ? 'Director' :
+                                             user?.role === 'social_worker' ? 'Trabajo Social' :
+                                             user?.role === 'physiotherapist' ? 'Fisioterapia' :
+                                             user?.role === 'occupational_therapist' ? 'Terapia Ocupacional' :
                                              user?.role || 'Personal'}
                                         </p>
                                     </div>

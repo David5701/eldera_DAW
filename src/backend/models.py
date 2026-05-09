@@ -14,7 +14,7 @@ from sqlalchemy import (
     Text,
     Time,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 
 # Compatibilidad Multi-DB (Postgres JSONB vs SQLite JSON para tests)
 JSON_TYPE = JSON().with_variant(JSONB(), "postgresql")
@@ -201,17 +201,14 @@ class Resident(Base):
 
     # === HIGIENE Y CONTINENCIA ===
     urinary_incontinence = Column(Boolean, default=False, index=True)
-    # veces/día
-    urinary_incontinence_frequency = Column(Integer, nullable=True)
     fecal_incontinence = Column(Boolean, default=False, index=True)
-    fecal_incontinence_frequency = Column(Integer, nullable=True)  # veces/día
+    fecal_incontinence_notes = Column(Text, nullable=True)
     # 'esfuerzo', 'urgencia', etc.
     incontinence_type = Column(String, nullable=True)
     night_incontinence = Column(Boolean, default=False)
     diaper_use = Column(Boolean, default=False)
     diaper_type = Column(String, nullable=True)  # 'bragapanal', 'panal'
     diaper_size = Column(String, nullable=True)  # 'S', 'M', 'L', 'XL'
-    diaper_brand = Column(String, nullable=True)
     diaper_changes_per_day = Column(Integer, nullable=True)
     # 'autonomous', 'partial_help', 'dependent'
     bath_autonomy = Column(String, nullable=True)
@@ -354,5 +351,6 @@ class User(Base):
     hashed_password = Column(String)
     role = Column(String)  # 'admin', 'nurse', 'aux'
     is_active = Column(Boolean, default=True)
+    supabase_uid = Column(UUID(as_uuid=True), unique=True, nullable=True)
 
 

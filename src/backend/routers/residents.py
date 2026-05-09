@@ -265,13 +265,19 @@ def read_residents(
 
         # Aplicar filtros de búsqueda
         if q:
-            q_search = f"%{q}%"
-            # Búsqueda simple compatible con cualquier DB
-            query = query.filter(
-                (models.Resident.name.ilike(q_search))
-                | (models.Resident.surname.ilike(q_search))
-                | (models.Resident.room_number.ilike(q_search))
-            )
+            # Búsqueda accent-insensitive usando unaccent de Postgres
+            # Dividimos por espacios para permitir búsquedas cruzadas (ej: "David Leon")
+            terms = q.strip().split()
+            print(f"DEBUG: Searching residents with terms: {terms}")
+            for term in terms:
+                q_term = f"%{term}%"
+                query = query.filter(
+                    or_(
+                        func.public.unaccent(models.Resident.name).ilike(func.public.unaccent(q_term)),
+                        func.public.unaccent(models.Resident.surname).ilike(func.public.unaccent(q_term)),
+                        models.Resident.room_number.ilike(q_term)
+                    )
+                )
         if room:
             query = query.filter(models.Resident.room_number == room)
 

@@ -120,126 +120,106 @@ export default function DynamicLists({ onBack }) {
     // --- VISTA DE DETALLE (TABLA) ---
     if (selectedList) {
         return (
-            <div className="print-container flex flex-col gap-6 w-full h-full animate-in fade-in duration-300 pt-2 md:pt-0 print:pt-0 print:block print:gap-0 print:h-auto">
+            <div className={`print-container flex flex-col gap-6 w-full h-full animate-in fade-in duration-300 pt-2 md:pt-0 print:pt-0 print:block print:gap-0 print:h-auto`}>
                 <style>{`
                     @media print {
-                        /* 1. PAGE SETUP */
-                        @page { margin: 10mm !important; size: auto; }
-                        
                         * {
                             -webkit-print-color-adjust: exact !important;
                             print-color-adjust: exact !important;
-                            box-sizing: border-box !important;
                         }
 
-                        /* 2. ROOT RESET */
-                        :root {
-                            --app-bg: ${printBackground ? '#dbeafe' : 'white'} !important;
+                        @page { 
+                            margin: 10mm !important; 
+                            size: auto; 
                         }
-
-                        html, body, #root, #app-layout, .min-h-screen, main {
-                            background-color: var(--app-bg) !important;
+                        
+                        html, body, #root, #app-layout, .min-h-screen, main, main > div {
+                            background-color: ${printBackground ? '#dbeafe' : 'white'} !important;
                             width: 100% !important;
                             height: auto !important;
-                            min-height: 0 !important;
-                            margin: 0 !important;
-                            padding: 20mm !important; /* Document breathing space */
-                            overflow: visible !important;
-                            position: static !important;
-                        }
-
-                        /* 3. CONTAINER */
-                        .print-container {
-                            width: 100% !important;
                             margin: 0 !important;
                             padding: 0 !important;
                             display: block !important;
                         }
 
-                        header, nav, .no-print { display: none !important; }
+                        header, nav, aside, .no-print, [role="navigation"] { 
+                            display: none !important; 
+                        }
 
-                        /* 4. OUTER CARD - SPACIOUS & RESTORED */
+                        .print-container {
+                            width: 100% !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
+
                         .bg-white {
-                            border-radius: 1.5rem !important;
-                            /* Ink: 1px Solid. PDF: None/Shadow */
-                            border: ${printBackground ? 'none' : '1px solid #cbd5e1'} !important;
+                            background-color: white !important;
+                            border: none !important;
+                            border-radius: ${printBackground ? '2rem' : '0'} !important;
                             box-shadow: ${printBackground ? '0 10px 20px -5px rgba(0,0,0,0.1)' : 'none'} !important;
-                            background-color: white !important;
-                            padding: 2.5rem !important; /* Generous padding as requested */
-                            margin-bottom: 1rem !important;
-                        }
-                        
-                        /* Allow inner content to breathe */
-                        .print\\:p-8 { padding: 2.5rem !important; }
-
-                        /* 5. INNER TABLE WRAPPER */
-                        .overflow-x-auto {
-                            border: 1px solid #cbd5e1 !important;
-                            border-radius: 1rem !important;
-                            overflow: hidden !important;
-                            background-color: white !important;
-                            margin-top: 2rem !important; /* separation from header */
-                            width: 100% !important;
+                            padding: 10mm !important;
+                            width: ${printBackground ? 'calc(100% - 20mm)' : '100%'} !important;
+                            margin: ${printBackground ? '10mm auto' : '0'} !important;
+                            min-height: ${printBackground ? '250mm' : 'auto'} !important;
                         }
 
-                        /* 6. TABLE STYLES */
                         table {
-                            border-collapse: collapse !important;
                             width: 100% !important;
-                            border-spacing: 0 !important;
-                            table-layout: auto !important;
+                            border-collapse: collapse !important;
+                            margin-top: 5mm !important;
                         }
-                        
-                        th, td {
-                            border-bottom: 1px solid #cbd5e1 !important;
-                            border-top: none !important;
-                            border-left: none !important;
-                            border-right: none !important;
-                            padding: 12px 10px !important; /* Comfortable spacing */
-                            font-size: 10px !important;
-                        }
-                        
-                        /* HEADER STYLES inside table */
+
                         thead th {
-                            background-color: #f8fafc !important;
-                            color: #64748b !important;
-                            font-weight: 800 !important;
+                            background-color: #f1f5f9 !important;
+                            color: #334155 !important;
+                            font-weight: bold !important;
+                            padding: 4mm 2mm !important;
+                            text-align: left !important;
+                            border-bottom: 2px solid #e2e8f0 !important;
                         }
 
                         td {
-                            word-wrap: break-word !important; 
-                            overflow-wrap: break-word !important;
+                            padding: 3mm 2mm !important;
+                            border-bottom: 1px solid #f1f5f9 !important;
+                            color: #475569 !important;
                         }
-                        
-                        /* Helpers */
-                        .max-w-2xl, .max-w-3xl, .max-w-4xl, .max-w-5xl, .w-full {
-                            max-width: 100% !important;
-                            width: 100% !important;
-                        }
+
+                        .print\\:hidden { display: none !important; }
                     }
                 `}</style>
 
                 {/* Print Options Control moved to Card Header */}
 
                 {/* Card Container */}
-                {/* RESTORED: Premium Layout (Rounded, White, Shadow) */}
-                <div className="bg-white rounded-[2.5rem] p-4 md:p-8 shadow-sm min-h-[500px] print:rounded-[2rem] print:border print:border-slate-300 print:shadow-sm print:p-8 print:w-full print:h-full print:min-h-0">
+                <div className="bg-white rounded-[2.5rem] p-4 md:p-8 shadow-sm min-h-[500px] print:rounded-[2rem] print:border print:border-slate-200 print:p-10 print:w-full print:min-h-0 print:shadow-none">
 
-                    {/* A) HEADER PARA IMPRESIÓN (Oculto en pantalla) */}
-                    <div className="hidden print:flex flex-col gap-4 mb-6 border-b border-slate-200 pb-4">
-                        <div className="flex justify-between items-start">
-                            <img src={logo} alt="Eldera" className="h-10" />
+                    {/* A) HEADER PARA IMPRESIÓN (DISEÑO PREMIUM) */}
+                    <div className="hidden print:flex flex-col gap-6 mb-8">
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-5">
+                                <div className="w-14 h-14 flex items-center justify-center">
+                                    <img src={logo} alt="Eldera" className="w-full h-full object-contain" />
+                                </div>
+                                <div>
+                                    <h1 className="text-2xl font-black text-slate-900 leading-tight uppercase tracking-tight">
+                                        {selectedList.list_name}
+                                    </h1>
+                                    <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                        {typeof residenceName === 'string' ? residenceName : 'Residencia Eldera'}
+                                    </p>
+                                </div>
+                            </div>
                             <div className="text-right">
-                                <p className="text-lg font-bold text-slate-900">
-                                    {typeof residenceName === 'string' ? residenceName : 'Residencia Eldera'}
-                                </p>
-                                <p className="text-sm text-slate-500">{new Date().toLocaleDateString()}</p>
+                                <div className="mb-2">
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Fecha de Informe</p>
+                                    <p className="text-xs font-black text-slate-900">{new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                                </div>
+                                <p className="text-[9px] font-bold text-slate-400">Total: {selectedList.residents.length} registros</p>
                             </div>
                         </div>
-                        <h1 className="text-3xl font-black text-slate-900 mt-2">{selectedList.list_name}</h1>
+                        <div className="h-0.5 bg-slate-900 w-full opacity-80" />
                     </div>
 
-                    {/* B) HEADER PARA PANTALLA (Compacto) */}
                     {/* B) HEADER PARA PANTALLA (Compacto & Responsive) */}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8 print:hidden">
                         <div className="flex items-center gap-3 flex-1 min-w-0 w-full sm:w-auto">
@@ -285,25 +265,25 @@ export default function DynamicLists({ onBack }) {
                     </div>
 
                     {/* CONTENEDOR DE TABLA */}
-                    <div className="overflow-x-auto rounded-3xl border border-slate-200 overflow-hidden print:w-full print:border print:border-slate-300 print:rounded-2xl">
-                        <table className="min-w-full divide-y divide-slate-200 hidden md:table border-collapse print:table print:w-full">
-                            <thead className="bg-slate-50 print:bg-slate-100">
+                    <div className="overflow-x-auto rounded-3xl border border-slate-200 overflow-hidden print:w-full print:border-none print:rounded-none">
+                        <table className="min-w-full divide-y divide-slate-200 hidden md:table border-collapse print:table print:w-full print:divide-y-0">
+                            <thead className="bg-slate-50 print:bg-transparent">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider print:px-2 print:py-2 print:text-[9px] print:text-black">Hab.</th>
-                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider print:px-2 print:py-2 print:text-[9px] print:text-black">Residente</th>
-                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider print:px-2 print:py-2 print:text-[9px] print:text-black">Detalles</th>
+                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider print:bg-slate-100 print:rounded-l-xl print:text-slate-700 print:py-3">Hab.</th>
+                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider print:bg-slate-100 print:text-slate-700 print:py-3">Residente</th>
+                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider print:bg-slate-100 print:rounded-r-xl print:text-slate-700 print:py-3">Detalles</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-slate-200 print:divide-slate-300">
+                            <tbody className="bg-white divide-y divide-slate-200 print:divide-slate-200">
                                 {selectedList.residents.map((r) => (
                                     <tr key={r.id} className="hover:bg-slate-50 transition-colors print:break-inside-avoid">
-                                        <td className="px-6 py-5 whitespace-nowrap text-xs md:text-sm font-bold text-slate-900 print:px-2 print:py-2 print:text-xs">{r.room_number}</td>
-                                        <td className="px-6 py-5 whitespace-nowrap text-xs md:text-sm font-medium text-slate-900 print:px-2 print:py-2 print:text-xs">{r.surname}, {r.name}</td>
-                                        <td className="px-6 py-5 text-sm text-slate-600 print:px-2 print:py-2 print:text-xs">
-                                            <div className="flex flex-wrap gap-2">
+                                        <td className="px-6 py-5 whitespace-nowrap text-xs md:text-sm font-bold text-slate-900 print:px-3 print:py-4 print:text-[11px]">{r.room_number}</td>
+                                        <td className="px-6 py-5 whitespace-nowrap text-xs md:text-sm font-medium text-slate-900 print:px-3 print:py-4 print:text-[11px]">{r.surname}, {r.name}</td>
+                                        <td className="px-6 py-5 text-sm text-slate-600 print:px-3 print:py-4 print:text-[11px]">
+                                            <div className="flex flex-wrap gap-2 print:gap-1.5">
                                                 {Object.entries(r.relevant_data).map(([key, value]) => (
-                                                    <span key={key} className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200 print:bg-white print:border-slate-300 print:text-black print:px-1.5 print:py-0.5 print:rounded-md print:leading-tight">
-                                                        <span className='font-bold mr-1.5 uppercase text-[10px] text-slate-500 print:text-black print:text-[9px]'>{key}:</span>
+                                                    <span key={key} className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200 print:bg-transparent print:border-none print:text-black print:px-0 print:py-0 print:rounded-none">
+                                                        <span className='font-bold mr-1.5 uppercase text-[10px] text-slate-500 print:text-slate-400 print:text-[9px]'>{key}:</span>
                                                         {value != null ? value.toString() : '--'}
                                                     </span>
                                                 ))}

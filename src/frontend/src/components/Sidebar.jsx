@@ -34,7 +34,8 @@ export default function Sidebar({ isOpen, onClose }) {
         localStorage.setItem('sidebarCollapsed', JSON.stringify(newState));
     };
 
-    const canAddResident = ['admin', 'director', 'nurse', 'doctor'].includes(user?.role);
+    const currentUserRole = (user?.role || '').toLowerCase().trim();
+    const canAddResident = ['admin', 'director', 'nurse', 'doctor'].includes(currentUserRole);
 
     const navigation = [
         { name: 'Panel de Control', href: '/', icon: LayoutDashboard },

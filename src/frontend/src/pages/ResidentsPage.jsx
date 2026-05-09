@@ -175,28 +175,7 @@ const ResidentsPage = () => {
 
         return (
             <div className="flex flex-col gap-4 w-full">
-                {/* Status Tabs */}
-                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-200 overflow-x-auto no-scrollbar">
-                    {[
-                        { id: 'active', label: 'Activos', color: 'blue' },
-                        { id: 'hospitalized', label: 'Hospitalizados', color: 'amber' },
-                        { id: 'inactive', label: 'Bajas', color: 'slate' },
-                        { id: 'deceased', label: 'Defunciones', color: 'rose' },
-                        { id: 'all', label: 'Todos', color: 'indigo' }
-                    ].map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => handleStatusChange(tab.id)}
-                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-                                statusFilter === tab.id 
-                                ? `bg-white text-${tab.color}-600 shadow-sm border border-${tab.color}-200` 
-                                : 'text-slate-500 hover:bg-white/50 hover:text-slate-700'
-                            }`}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
+                {/* Status Tabs removed as requested */}
 
                 <div className="flex items-center gap-2">
                     <div className="flex-1 flex items-center rounded-xl overflow-hidden h-11 transition-all bg-white shadow-md focus-within:border-blue-400">

@@ -65,19 +65,19 @@ const translateCareType = (key) => {
  * Incluye roles, estados clínicos, tipos de dieta, niveles de movilidad y dispositivos.
  */
 const TRANSLATIONS = {
+    // Movilidad y Estados
     'autonomous': 'Autónomo',
     'cane': 'Con bastón',
     'walker': 'Con andador',
     'wheelchair_manual': 'Silla de ruedas manual',
     'wheelchair_electric': 'Silla de ruedas eléctrica',
     'bedridden': 'Encamado',
-    'left': 'Izquierdo',
-    'right': 'Derecho',
-    'both': 'Ambos',
-    'diaper': 'Cambio Pañal',
-    'home': 'Concentrador',
-    'portable': 'Portátil / Bombona',
-    'cpap': 'CPAP/BIPAP',
+    'independent': 'Independiente',
+    'supervision': 'Supervisión',
+    'partial_help': 'Ayuda Parcial',
+    'total_help': 'Ayuda Total',
+    
+    // Dietas y Nutrición
     'normal': 'Basal',
     'diabetic': 'Diabética',
     'low_salt': 'Hiposódica',
@@ -85,121 +85,82 @@ const TRANSLATIONS = {
     'protection': 'Protección Gástrica',
     'soft': 'Blanda / Fácil Masticación',
     'pureed': 'Triturada',
+    
+    // Incontinencia y Eliminación
     'esfuerzo': 'De Esfuerzo',
     'urgencia': 'De Urgencia',
     'rebosamiento': 'Por Rebosamiento',
     'funcional': 'Funcional',
     'refleja': 'Refleja',
-    'anatomical': 'Braga-pañal (Anatómico)',
-    'elastic': 'Pañal con Tiras',
-    'independent': 'Independiente',
-    'supervision': 'Supervisión',
-    'partial_help': 'Ayuda Parcial',
-    'total_help': 'Ayuda Total',
-    'none': 'GDS 1 - Sin deterioro',
-    'very_mild': 'GDS 2 - Muy leve',
-    'mild': 'GDS 3 - Leve',
-    'moderate': 'GDS 4 - Moderado',
-    'moderate_severe': 'GDS 5 - Mod. Severo',
-    'severe': 'GDS 6 - Severo',
-    'very_severe': 'GDS 7 - Muy severo',
-    'time': 'Temporal',
-    'space': 'Espacial',
-    'person': 'Personal',
-    'all': 'Global',
+    'anatomical': 'Anatómico',
+    'anatomy': 'Anatómico',
+    'elastic': 'Elástico',
+    'pant': 'Bragapañal',
+    
+    // Sujeciones
     'abdominal': 'Cinturón Abdominal',
     'pelvic': 'Cinturón Pélvico',
+    'muñequeras': 'Muñequeras',
     'wrist': 'Muñequeras',
+    'barandillas': 'Barandillas',
     'bars': 'Barandillas x2',
-    'safety_sheet': 'Sábana de Seguridad',
-    'admin': 'Administrador',
-    'director': 'Director',
-    'nurse': 'Enfermero/a',
-    'doctor': 'Médico',
-    'aux': 'Auxiliar',
-    'nursing': 'Enfermería',
-    'medical': 'Médico',
-    'physiotherapist': 'Fisioterapeuta',
-    'social_worker': 'Trabajador Social',
-    'occupational_therapist': 'Terapeuta Ocup.',
-    'wet': 'Mojado',
-    'dry': 'Seco',
-    'soiled': 'Sucio',
-    'clean': 'Limpio',
-    'supine': 'Decúbito Supino',
-    'prone': 'Decúbito Prono',
-    'complete': 'Completa',
-    'partial': 'Parcial',
-    'yes': 'Sí',
-    'no': 'No',
+    
+    // Cuidados y Evolutivos
+    'hygiene': 'Higiene',
+    'diaper': 'Cambio de Pañal',
+    'fluid_intake': 'Ingesta Líquidos',
+    'food_intake': 'Ingesta Comida',
+    'positioning': 'Cambios Posturales',
+    'vomiting': 'Vómitos',
+    'stool': 'Deposición',
+    'voiding': 'Micción',
+    'fecal_incontinence': 'Incontinencia Fecal',
+    'urinary_incontinence': 'Incontinencia Urinaria',
+    'physical_restraint': 'Sujeción Física',
+    'safety_sheet': 'Hoja de Seguridad',
+    'first_impressions': 'Observaciones',
+    'care_plan': 'Plan de Cuidados',
+    
+    // Estados de Residente
     'active': 'Activo',
     'hospitalized': 'Hospitalizado',
     'inactive': 'Baja Temporal',
     'deceased': 'Defunción',
-    'permanent': 'Permanente',
-    'temporary': 'Temporal',
-    'respite': 'Respiro Familiar',
+    
+    // Otros
+    'yes': 'Sí',
+    'no': 'No',
     'M': 'Masculino',
     'F': 'Femenino',
-    'divorced': 'Divorciado/a',
-    'S': 'Pequeña (S)',
-    'size_M': 'Mediana (M)',
-    'L': 'Grande (L)',
-    'XL': 'Extra Grande (XL)',
     'ss': 'Seguridad Social',
     'private': 'Privado',
-    'Dcha': 'D. Lateral Derecho',
-    'Izda': 'D. Lateral Izquierdo',
-    'Supino': 'Decúbito Supino',
-    'Sedestación': 'Sedestación',
-    'positioning': 'Cambios Posturales',
-    'food_intake': 'Alimentación',
-    'fluid_intake': 'Hidratación',
-    'vomiting': 'Vómitos',
-    'Poco': 'Leve / Escaso',
-    'Moderado': 'Moderado',
-    'Abundante': 'Abundante',
-    'Aseo en cama': 'Aseo en Cama',
-    'Ducha completa': 'Ducha Completa',
-    'Lavado parcial': 'Lavado Parcial',
-    'Cambio ropa': 'Cambio de Ropa',
-    'meal_breakfast': 'Desayuno',
-    'meal_lunch': 'Comida',
-    'meal_dinner': 'Cena',
-    'hygiene': 'Aseo e Higiene',
-    'diaper': 'Cambio Pañal',
-    'heart_rate': 'Frecuencia Cardíaca',
-    'temperature': 'Temperatura',
-    'glucose': 'Glucemia',
-    'spo2': 'Saturación O2',
-    'weight': 'Peso',
-    'ta_systolic': 'Tensión Sistólica',
-    'ta_diastolic': 'Tensión Diastólica',
-    'blood_pressure': 'Tensión Arterial',
-    'mobilization': 'Movilización',
-    'occasional': 'Ocasional',
-    'frequent': 'Frecuente',
-    'total': 'Total',
-    'anatomy': 'Anatómico / Bragapañal',
-    'pant': 'Bragapañal',
-    'low': 'Bajo',
-    'medium': 'Medio',
-    'high': 'Alto',
-    'verbal': 'Verbal',
-    'physical': 'Físico',
-    'temporal': 'Temporal',
-    'spatial': 'Espacial',
-    'personal': 'Personal',
-    'global': 'Global',
-    'DNI': 'DNI / NIE',
-    'PASSPORT': 'Pasaporte',
-    'OTHER': 'Otro',
 };
 
 const EDIT_TAB_MAP = {
     admin: 0, salud: 1, nutrition: 2, elimination: 3,
     mobility: 4, sleep: 5, cognitive: 6, self_perception: 7,
     social: 8, sexuality: 9, stress: 10, values: 11
+};
+
+const canEditSection = (sectionId, userRole) => {
+    if (!userRole) return false;
+    const role = userRole.toLowerCase().trim();
+    if (['admin', 'director', 'doctor', 'nurse'].includes(role)) return true;
+    
+    // Aux can edit basic identification and some functional patterns
+    if (role === 'aux') {
+        const auxAllowed = ['admin', 'nutrition', 'elimination', 'mobility', 'sleep', 'values'];
+        return auxAllowed.includes(sectionId);
+    }
+    
+    // Technical roles (Social/Physio/Occupational) can only edit their specific sections
+    if (role === 'social_worker') {
+        return ['self_perception', 'social', 'values'].includes(sectionId);
+    }
+    if (role === 'physiotherapist' && sectionId === 'mobility') return true;
+    if (role === 'occupational_therapist' && sectionId === 'cognitive') return true;
+
+    return false;
 };
 
 const t = (value) => {
@@ -291,12 +252,12 @@ function HealthDetail({ groupedVitals, onRefresh, startDate, endDate, onStartCha
         const filtered = allVitals.filter(v => v.vital_type === type);
         
         const colorClasses = {
-            indigo: { bg: 'bg-indigo-50/50', text: 'text-indigo-600', border: 'border-indigo-100', iconBg: 'bg-white' },
-            rose: { bg: 'bg-rose-50/50', text: 'text-rose-600', border: 'border-rose-100', iconBg: 'bg-white' },
-            blue: { bg: 'bg-blue-50/50', text: 'text-blue-600', border: 'border-blue-100', iconBg: 'bg-white' },
-            orange: { bg: 'bg-orange-50/50', text: 'text-orange-600', border: 'border-orange-100', iconBg: 'bg-white' },
-            emerald: { bg: 'bg-emerald-50/50', text: 'text-emerald-600', border: 'border-emerald-100', iconBg: 'bg-white' },
-            purple: { bg: 'bg-purple-50/50', text: 'text-purple-600', border: 'border-purple-100', iconBg: 'bg-white' },
+            indigo: { bg: 'bg-indigo-100', text: 'text-indigo-800', border: 'border-indigo-200', iconBg: 'bg-indigo-600 text-white', valueText: 'text-indigo-700' },
+            rose: { bg: 'bg-rose-100', text: 'text-rose-800', border: 'border-rose-200', iconBg: 'bg-rose-600 text-white', valueText: 'text-rose-700' },
+            blue: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200', iconBg: 'bg-blue-600 text-white', valueText: 'text-blue-700' },
+            orange: { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200', iconBg: 'bg-orange-600 text-white', valueText: 'text-orange-700' },
+            emerald: { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-200', iconBg: 'bg-emerald-600 text-white', valueText: 'text-emerald-700' },
+            purple: { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200', iconBg: 'bg-purple-600 text-white', valueText: 'text-purple-700' },
         };
         
         const cls = colorClasses[color] || colorClasses.indigo;
@@ -305,12 +266,12 @@ function HealthDetail({ groupedVitals, onRefresh, startDate, endDate, onStartCha
             <div className={`bg-white rounded-[2rem] border border-slate-100 shadow-sm flex flex-col h-[500px] overflow-hidden animate-in fade-in slide-in-from-bottom-4`}>
                 <div className={`p-6 border-b ${cls.border} flex items-center justify-between ${cls.bg}`}>
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${cls.iconBg} shadow-sm ${cls.text}`}>
+                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${cls.iconBg} shadow-sm`}>
                             <Icon size={20} />
                         </div>
-                        <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">{title}</h3>
+                        <h3 className={`text-lg font-black ${cls.text} uppercase tracking-tight`}>{title}</h3>
                     </div>
-                    <span className="text-[10px] font-black px-2 py-1 bg-white rounded-lg text-slate-400 border border-slate-100 uppercase">{unit}</span>
+                    <span className={`text-[10px] font-black px-2 py-1 bg-white rounded-lg ${cls.text} border ${cls.border} uppercase shadow-sm`}>{unit}</span>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
                     {filtered.length > 0 ? (
@@ -325,7 +286,7 @@ function HealthDetail({ groupedVitals, onRefresh, startDate, endDate, onStartCha
                                     </p>
                                 </div>
                                 <div className="text-right">
-                                    <span className={`text-2xl font-black text-slate-800`}>
+                                    <span className={`text-2xl font-black ${cls.valueText}`}>
                                         {typeof log.value === 'number' ? Math.round(log.value) : log.value}
                                     </span>
                                 </div>
@@ -370,16 +331,16 @@ function CareDetail({ groupedCare }) {
         // Get unique care types in the logs to create specific cards
         const uniqueTypes = [...new Set(sorted.map(l => l.care_type))];
         
-        // Define colors/icons for each type for consistent styling
+        // Define colors/icons for each type for consistent styling, ensuring distinct colors
         const typeStyles = {
-            'hygiene': { icon: User, color: 'text-sky-600', bg: 'bg-sky-50' },
-            'diaper': { icon: Droplet, color: 'text-blue-600', bg: 'bg-blue-50' },
-            'fluid_intake': { icon: Droplet, color: 'text-cyan-600', bg: 'bg-cyan-50' },
-            'food_intake': { icon: Utensils, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-            'positioning': { icon: ArrowRightLeft, color: 'text-amber-700', bg: 'bg-amber-50' },
-            'vomiting': { icon: AlertTriangle, color: 'text-rose-600', bg: 'bg-rose-50' },
-            'stool': { icon: Layers, color: 'text-orange-800', bg: 'bg-orange-50' },
-            'voiding': { icon: Droplet, color: 'text-indigo-600', bg: 'bg-indigo-50' }
+            'hygiene': { icon: User, color: 'text-teal-800', bg: 'bg-teal-100', iconBg: 'bg-teal-600 text-white', border: 'border-teal-200' },
+            'diaper': { icon: Droplet, color: 'text-fuchsia-800', bg: 'bg-fuchsia-100', iconBg: 'bg-fuchsia-600 text-white', border: 'border-fuchsia-200' },
+            'fluid_intake': { icon: Droplet, color: 'text-cyan-800', bg: 'bg-cyan-100', iconBg: 'bg-cyan-600 text-white', border: 'border-cyan-200' },
+            'food_intake': { icon: Utensils, color: 'text-emerald-800', bg: 'bg-emerald-100', iconBg: 'bg-emerald-600 text-white', border: 'border-emerald-200' },
+            'positioning': { icon: ArrowRightLeft, color: 'text-violet-800', bg: 'bg-violet-100', iconBg: 'bg-violet-600 text-white', border: 'border-violet-200' },
+            'vomiting': { icon: AlertTriangle, color: 'text-rose-800', bg: 'bg-rose-100', iconBg: 'bg-rose-600 text-white', border: 'border-rose-200' },
+            'stool': { icon: Layers, color: 'text-amber-800', bg: 'bg-amber-100', iconBg: 'bg-amber-600 text-white', border: 'border-amber-200' },
+            'voiding': { icon: Droplet, color: 'text-blue-800', bg: 'bg-blue-100', iconBg: 'bg-blue-600 text-white', border: 'border-blue-200' }
         };
 
         return uniqueTypes.map(type => ({
@@ -400,8 +361,8 @@ function CareDetail({ groupedCare }) {
             ) : (
                 categories.map(cat => (
                     <div key={cat.id} className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[500px] hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500">
-                        <div className={`p-6 border-b border-slate-100 ${cat.style.bg} flex items-center gap-4`}>
-                            <div className={`w-12 h-12 rounded-2xl bg-white ${cat.style.color} flex items-center justify-center shadow-sm`}>
+                        <div className={`p-6 border-b ${cat.style.border} ${cat.style.bg} flex items-center gap-4`}>
+                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${cat.style.iconBg} shadow-sm`}>
                                 <cat.style.icon size={24} />
                             </div>
                             <h3 className={`text-lg font-black ${cat.style.color} tracking-tight`}>{cat.label}</h3>
@@ -815,20 +776,23 @@ function EliminationDetail({ resident }) {
                     <div className="space-y-3">
                         <InfoRow label="Incontinencia" value={t(resident.urinary_incontinence)} />
                         {resident.urinary_incontinence && (
-                            <>
-                                <InfoRow label="Tipo" value={t(resident.incontinence_type)} />
-                                <InfoRow label="Frecuencia / Día" value={t(resident.urinary_incontinence_frequency)} />
-                                <InfoRow label="Incontinencia Nocturna" value={t(resident.night_incontinence)} />
-                            </>
+                            <InfoRow label="Tipo" value={t(resident.incontinence_type)} />
                         )}
-                        <div className="mt-2 pt-2 border-t border-amber-200/50">
-                            <InfoRow label="Sonda Vesical" value={t(resident.device_catheter)} />
-                            {resident.device_catheter && resident.device_invasive_type && (
-                                <p className="text-[10px] text-amber-700 font-bold uppercase mt-1 ml-auto text-right italic">
-                                    {resident.device_invasive_type}
-                                </p>
-                            )}
-                        </div>
+                        
+                        {/* Only show devices/extra if active/true */}
+                        {resident.night_incontinence && (
+                            <InfoRow label="Incontinencia Nocturna" value="Sí" />
+                        )}
+                        {resident.device_catheter && (
+                            <div className="mt-2 pt-2 border-t border-amber-200/50">
+                                <InfoRow label="Sonda Vesical" value="Sí" />
+                                {resident.device_invasive_type && (
+                                    <p className="text-[10px] text-amber-700 font-bold uppercase mt-1 ml-auto text-right italic">
+                                        {resident.device_invasive_type}
+                                    </p>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -839,11 +803,18 @@ function EliminationDetail({ resident }) {
                     <div className="space-y-3">
                         <InfoRow label="Incontinencia" value={t(resident.fecal_incontinence)} />
                         {resident.fecal_incontinence && (
-                            <InfoRow label="Frecuencia / Día" value={t(resident.fecal_incontinence_frequency)} />
+                            <div className="mt-2 pt-2 border-t border-amber-200/50">
+                                <p className="text-[10px] font-black text-amber-800 uppercase mb-2">Notas / Observaciones</p>
+                                <p className="text-sm text-slate-700 bg-white/50 p-3 rounded-xl border border-amber-100 italic leading-relaxed">
+                                    {resident.fecal_incontinence_notes || 'Sin observaciones registradas'}
+                                </p>
+                            </div>
                         )}
-                        <div className="mt-2 pt-2 border-t border-amber-200/50">
-                            <InfoRow label="Ostomía (PEG/Estoma)" value={t(resident.device_peg)} />
-                        </div>
+                        {resident.device_peg && (
+                            <div className="mt-2 pt-2 border-t border-amber-200/50">
+                                <InfoRow label="Ostomía (PEG/Estoma)" value="Sí" />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -857,13 +828,12 @@ function EliminationDetail({ resident }) {
                     {resident.diaper_use && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
                             <InfoRow label="Tipo" value={
-                                resident.diaper_type === 'anatomy' ? 'Anatómico' :
+                                resident.diaper_type === 'anatomical' || resident.diaper_type === 'anatomy' ? 'Anatómico' :
                                     resident.diaper_type === 'pant' ? 'Bragapañal' :
                                         resident.diaper_type === 'elastic' ? 'Elástico' : resident.diaper_type || '--'
                             } />
                             <InfoRow label="Talla" value={resident.diaper_size || '--'} />
                             <InfoRow label="Cambios / Día" value={resident.diaper_changes_per_day || '--'} />
-                            <InfoRow label="Marca" value={resident.diaper_brand || '--'} />
                         </div>
                     )}
                     <div className="mt-4 pt-4 border-t border-amber-100 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -882,10 +852,6 @@ function SelfPerceptionDetail({ resident }) {
     <div className="space-y-6">
 
         <div className="bg-pink-50 p-6 rounded-2xl border border-pink-100">
-            <h3 className="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
-                <Smile className="w-5 h-5 text-pink-500" /> Autopercepción y Estado Emocional
-            </h3>
-            
             <div className="space-y-6">
                 {resident.emotional_state && (
                     <div>
@@ -919,9 +885,6 @@ function SexualityDetail({ resident }) {
     <div className="space-y-6">
 
         <div className="bg-rose-50 p-6 rounded-2xl border border-rose-100">
-            <h3 className="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
-                <HeartPulse className="w-5 h-5 text-rose-500" /> Sexualidad y Reproducción
-            </h3>
             <div className="space-y-4">
                 <p className="text-slate-600 text-sm leading-relaxed">
                     Este patrón valora la satisfacción o alteraciones en la sexualidad y etapas reproductivas.
@@ -944,9 +907,6 @@ function SexualityDetail({ resident }) {
 
 function StressDetail({ resident }) {
     return (
-    <div className="space-y-6">
-
-
         <div className="bg-orange-50 p-6 rounded-2xl border border-orange-100">
             <h4 className="font-bold text-orange-900 mb-4 flex items-center gap-2">
                 <Shield className="w-5 h-5" /> Sujeciones y Conductas
@@ -955,23 +915,21 @@ function StressDetail({ resident }) {
                 <InfoRow label="Requiere Sujeción" value={t(resident.requires_restraint)} />
                 {resident.requires_restraint && (
                     <>
-                        {resident.restraint_type && <InfoRow label="Tipo" value={resident.restraint_type} />}
-                        {resident.restraint_schedule && <InfoRow label="Horario" value={resident.restraint_schedule} />}
+                        {resident.restraint_type && <InfoRow label="Tipo de Sujeción" value={t(resident.restraint_type)} />}
+                        {resident.restraint_schedule && <InfoRow label="Horario / Pauta" value={resident.restraint_schedule} />}
                         {resident.restraint_justification && (
                             <div className="mt-3">
-                                <p className="text-xs font-bold text-orange-700 mb-1">JUSTIFICACIÓN:</p>
-                                <p className="text-slate-700 text-sm bg-white p-3 rounded-lg">{resident.restraint_justification}</p>
+                                <p className="text-xs font-bold text-orange-700 mb-1">JUSTIFICACIÓN MÉDICA:</p>
+                                <p className="text-slate-700 text-sm bg-white p-3 rounded-xl border border-orange-100">{resident.restraint_justification}</p>
                             </div>
                         )}
                         {resident.restraint_authorization_date && (
                             <InfoRow label="Fecha Autorización" value={new Date(resident.restraint_authorization_date).toLocaleDateString()} />
                         )}
-                        <InfoRow label="Hoja de Seguridad" value={t(resident.restraint_safety_sheet)} />
                     </>
                 )}
             </div>
         </div>
-    </div>
     );
 }
 
@@ -994,32 +952,15 @@ function ValuesDetail({ resident }) {
         </div>
 
         <div className="bg-teal-50 p-6 rounded-2xl border border-teal-100">
-            <h4 className="font-bold text-teal-900 mb-4">Consentimientos</h4>
-            <div className="space-y-3">
-                <InfoRow label="Consentimiento Informado" value={t(resident.consent_informed)} />
-                {resident.consent_informed_date && (
-                    <InfoRow label="Fecha" value={new Date(resident.consent_informed_date).toLocaleDateString()} />
-                )}
-            </div>
+            <h4 className="font-bold text-teal-900 mb-4">Observaciones</h4>
+            {resident.first_impressions ? (
+                <p className="text-slate-700 whitespace-pre-wrap bg-white p-4 rounded-xl border border-teal-100 leading-relaxed">
+                    {resident.first_impressions}
+                </p>
+            ) : (
+                <p className="text-slate-400 italic text-sm">Sin observaciones registradas.</p>
+            )}
         </div>
-
-        {resident.requires_restraint && (
-            <div className="bg-rose-50 p-6 rounded-2xl border border-rose-100">
-                <h4 className="font-bold text-rose-900 mb-4 flex items-center gap-2">
-                    <ShieldAlert className="w-5 h-5" /> Protocolo de Sujeciones
-                </h4>
-                <div className="space-y-3">
-                    <InfoRow label="Tipo de Sujeción" value={resident.restraint_type || '--'} />
-                    <InfoRow label="Horario / Pauta" value={resident.restraint_schedule || '--'} />
-                    <InfoRow label="Hoja de Seguridad" value={t(resident.restraint_safety_sheet)} />
-                    <InfoRow label="Fecha Autorización" value={resident.restraint_authorization_date ? new Date(resident.restraint_authorization_date).toLocaleDateString() : '--'} />
-                    <div>
-                        <p className="text-xs font-bold text-rose-700 uppercase mb-1">Justificación Médica</p>
-                        <p className="text-rose-900 bg-white p-3 rounded-lg border border-rose-100 text-sm">{resident.restraint_justification || 'No especificada'}</p>
-                    </div>
-                </div>
-            </div>
-        )}
     </div>
     );
 }
@@ -1205,16 +1146,9 @@ function SocialDetail({ resident }) {
                     <p className="text-slate-600 text-sm leading-relaxed">{resident.family_situation || 'No hay descripción de la situación familiar.'}</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-white p-4 rounded-xl border border-slate-200">
-                        <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Representante Legal</p>
-                        <p className="font-bold text-slate-800">{resident.legal_representative_name || 'No consta'}</p>
-                        {resident.legal_representative_phone && <p className="text-xs text-indigo-600 font-medium">{resident.legal_representative_phone}</p>}
-                    </div>
-                    <div className="bg-white p-4 rounded-xl border border-slate-200">
-                        <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Apoyo Social / Amistades</p>
-                        <p className="text-sm text-slate-700">{resident.social_support_network || 'No registrado'}</p>
-                    </div>
+                <div className="bg-white p-4 rounded-xl border border-slate-200">
+                    <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Apoyo Social / Amistades</p>
+                    <p className="text-sm text-slate-700">{resident.social_support_network || 'No registrado'}</p>
                 </div>
 
                 {(resident.family_contacts && resident.family_contacts.length > 0) ? (
@@ -1230,13 +1164,6 @@ function SocialDetail({ resident }) {
                                     <span className="text-sm font-mono font-medium text-slate-600 bg-white px-2 py-1 rounded border border-slate-200 shadow-sm select-all">
                                         {contact.phone}
                                     </span>
-                                    <button
-                                        onClick={() => navigator.clipboard.writeText(contact.phone)}
-                                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
-                                        title="Copiar teléfono"
-                                    >
-                                        <Phone className="w-4 h-4" />
-                                    </button>
                                 </div>
                             </div>
                         ))}
@@ -1244,10 +1171,6 @@ function SocialDetail({ resident }) {
                 ) : (
                     <div className="text-center p-4 bg-slate-50 rounded-xl text-slate-400 text-sm">Sin contactos adicionales registrados</div>
                 )}
-
-                <div className="bg-white p-4 rounded-xl border border-slate-200">
-                    <InfoRow label="Sobrecarga del Cuidador" value={t(resident.caregiver_burden)} />
-                </div>
             </div>
         </div>
 
@@ -1517,7 +1440,7 @@ function ResidentProfile() {
     const navigate = useNavigate();
 
     const { user } = useAuth();
-    const [searchParams] = useSearchParams(); // Hook to read query params
+    const [searchParams, setSearchParams] = useSearchParams(); // Hook to read and write query params
 
     // Fetch residence name for Header
     const [residenceName, setResidenceName] = useState('Residencia Eldera Demo');
@@ -1563,7 +1486,7 @@ function ResidentProfile() {
     const [followupType, setFollowupType] = useState('');
 
     // UI State
-    const [activeSection, setActiveSection] = useState(searchParams.get('tab') || null);
+    const [activeSection, setActiveSection] = useState(() => searchParams.get('tab'));
 
 
     // Removed legacy recording state (recordType, quickType, substituting) in favor of QuickCareRecord component
@@ -1575,8 +1498,21 @@ function ResidentProfile() {
         const tab = searchParams.get('tab');
         if (tab && tab !== activeSection) {
             setActiveSection(tab);
+        } else if (!tab && activeSection) {
+            setActiveSection(null);
         }
-    }, [searchParams, activeSection, navigate]);
+    }, [searchParams, activeSection, user, setSearchParams]);
+
+    const handleBack = useCallback(() => {
+        // If we are in health, care or history, back goes to the residents list
+        if (activeSection === 'health' || activeSection === 'care' || activeSection === 'history') {
+            navigate('/residents');
+        } else {
+            // If we are in a Gordon pattern section, back goes to the profile menu (null section)
+            setActiveSection(null);
+            setSearchParams({});
+        }
+    }, [activeSection, navigate, setSearchParams]);
 
     // FETCHING INDIVIDUAL MODULES
     const fetchResident = useCallback(async (silent = false) => {
@@ -1695,15 +1631,8 @@ function ResidentProfile() {
         { id: 'values', label: '11. Valores-Creencias', icon: FileCheck, color: 'indigo', desc: 'Creencias, Religión' },
     ];
 
-    // RBAC: Filter sections based on user role
-    const SECTIONS = ALL_SECTIONS.filter(section => {
-        if (!user) return false;
-        if (user.role === 'admin' || user.role === 'director' || user.role === 'doctor' || user.role === 'nurse') return true;
-
-        // Aux roles cannot see clinical/sensitive tabs
-        const clinicalTabs = ['salud', 'cognitive', 'stress', 'sexuality'];
-        return !clinicalTabs.includes(section.id);
-    });
+    // RBAC: Show all sections to everyone, but editing is restricted elsewhere
+    const SECTIONS = ALL_SECTIONS;
 
     return (
         <DashboardLayout headerContent={residenceName ? { residenceName } : undefined}>
@@ -1791,7 +1720,7 @@ function ResidentProfile() {
                             <GeneralFollowups
                                 residentId={id}
                                 resident={resident}
-                                onBack={() => navigate('/residents')}
+                                onBack={handleBack}
                                 externalFilters={{
                                     startDate,
                                     endDate,
@@ -1811,7 +1740,7 @@ function ResidentProfile() {
                                 <div className="flex items-center gap-2 md:gap-4 px-3 py-3 md:px-6 md:py-4 border-b border-slate-200">
                                     <button
                                         type="button"
-                                        onClick={() => navigate('/residents')}
+                                        onClick={handleBack}
                                         className="w-10 h-10 md:w-12 md:h-12 bg-[#0F172A] hover:bg-slate-800 text-white rounded-full flex items-center justify-center transition-all shadow-md hover:shadow-lg shrink-0"
                                         title="Volver al listado"
                                     >
@@ -1864,7 +1793,7 @@ function ResidentProfile() {
                                     {!((activeSection === 'health' || activeSection === 'care')) && null}
 
                                     {/* Edit Button */}
-                                    {EDIT_TAB_MAP[activeSection] !== undefined && (
+                                    {EDIT_TAB_MAP[activeSection] !== undefined && canEditSection(activeSection, user?.role) && (
                                         <Link
                                             to={`/residents/${resident.id}/edit?tab=${EDIT_TAB_MAP[activeSection]}`}
                                             className="bg-white text-emerald-500 px-2.5 py-1.5 rounded-xl shadow-sm border border-emerald-400 flex items-center justify-center min-w-[44px] min-h-[44px] hover:bg-emerald-50 hover:border-emerald-500 hover:scale-105 transition-all shrink-0 ml-auto"
@@ -1910,7 +1839,7 @@ function ResidentProfile() {
                             {SECTIONS.map((section) => (
                                 <button
                                     key={section.id}
-                                    onClick={() => setActiveSection(section.id)}
+                                    onClick={() => setSearchParams({ tab: section.id })}
                                     className="group bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-300 rounded-[2rem] p-6 text-left transition-all duration-200 hover:-translate-y-1 hover:shadow-xl relative overflow-hidden flex flex-col justify-between h-48"
                                 >
                                     <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-5 transition-opacity duration-500">

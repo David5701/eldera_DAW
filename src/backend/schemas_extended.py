@@ -335,15 +335,13 @@ class ResidentBaseExtended(BaseModel, ResidentValidatorMixin):
 
     # Higiene y continencia
     urinary_incontinence: bool = False
-    urinary_incontinence_frequency: Optional[int] = None
     fecal_incontinence: bool = False
-    fecal_incontinence_frequency: Optional[int] = None
+    fecal_incontinence_notes: Optional[str] = None
     incontinence_type: Optional[str] = None
     night_incontinence: bool = False
     diaper_use: bool = False
     diaper_type: Optional[str] = None
     diaper_size: Optional[str] = None
-    diaper_brand: Optional[str] = None
     diaper_changes_per_day: Optional[int] = None
     bath_autonomy: Optional[str] = None
     bath_frequency: Optional[int] = None
@@ -620,15 +618,13 @@ class ResidentUpdateExtended(BaseModel, ResidentValidatorMixin):
 
     # Hygiene and Elimination
     urinary_incontinence: Optional[bool] = None
-    urinary_incontinence_frequency: Optional[int] = None
     fecal_incontinence: Optional[bool] = None
-    fecal_incontinence_frequency: Optional[int] = None
+    fecal_incontinence_notes: Optional[str] = None
     incontinence_type: Optional[str] = None
     night_incontinence: Optional[bool] = None
     diaper_use: Optional[bool] = None
     diaper_type: Optional[str] = None
     diaper_size: Optional[str] = None
-    diaper_brand: Optional[str] = None
     diaper_changes_per_day: Optional[int] = None
     bath_autonomy: Optional[str] = None
     bath_frequency: Optional[int] = None

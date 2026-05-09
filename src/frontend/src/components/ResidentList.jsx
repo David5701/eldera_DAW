@@ -11,6 +11,7 @@ import {
 import api from '../api/axios';
 import logo from '../assets/logo.svg';
 
+import { useAuth } from '../context/AuthContext';
 import { getResidentPhoto, calculateAge } from '../utils/residentUtils';
 
 /**
@@ -23,7 +24,12 @@ export default function ResidentList({
     totalPages,
     onPageChange
 }) {
+    const { user } = useAuth();
     const [residenceName, setResidenceName] = useState('');
+
+    const currentUserRole = (user?.role || '').toLowerCase().trim();
+    const canQuickRecord = ['admin', 'director', 'doctor', 'nurse', 'aux'].includes(currentUserRole);
+    const canEditGeneral = ['admin', 'director', 'doctor', 'nurse', 'aux'].includes(currentUserRole);
 
 
     // Fetch residence name from dashboard stats
@@ -58,15 +64,17 @@ export default function ResidentList({
                                     <div key={resident.id} className="w-full bg-white rounded-2xl shadow-md border border-slate-200 p-0 hover:shadow-xl transition-all group relative flex flex-col h-full overflow-hidden">
 
                                         {/* Header: Edit Button (Top Left) - Green Solid */}
-                                        <div className="absolute top-3 left-3 z-30">
-                                            <Link
-                                                to={`/residents/${resident.id}/edit?tab=0`}
-                                                className="bg-white text-emerald-500 w-10 h-10 rounded-xl shadow-sm border border-emerald-400 flex items-center justify-center hover:bg-emerald-50 hover:border-emerald-500 hover:scale-105 transition-all"
-                                                title="Editar Perfil"
-                                            >
-                                                <Edit2 size={18} strokeWidth={2.5} />
-                                            </Link>
-                                        </div>
+                                        {canEditGeneral && (
+                                            <div className="absolute top-3 left-3 z-30">
+                                                <Link
+                                                    to={`/residents/${resident.id}/edit?tab=0`}
+                                                    className="bg-white text-emerald-500 w-10 h-10 rounded-xl shadow-sm border border-emerald-400 flex items-center justify-center hover:bg-emerald-50 hover:border-emerald-500 hover:scale-105 transition-all"
+                                                    title="Editar Perfil"
+                                                >
+                                                    <Edit2 size={18} strokeWidth={2.5} />
+                                                </Link>
+                                            </div>
+                                        )}
 
                                         {/* Clickable Area */}
                                         <Link to={`/residents/${resident.id}`} className="flex-1 p-4 flex flex-col items-center">
@@ -153,16 +161,22 @@ export default function ResidentList({
                                             >
                                                 <Bed size={18} strokeWidth={3} className="group-hover/btn:scale-110 transition-transform" />
                                             </Link>
-                                            <Link
-                                                to={`/residents/${resident.id}/quick-record`}
-                                                className={`h-10 rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-95 ${resident.status === 'hospitalized' || isNonActive
-                                                    ? 'bg-slate-800 border border-slate-700 text-slate-500 cursor-not-allowed pointer-events-none'
-                                                    : 'bg-indigo-600 hover:bg-indigo-700 border border-indigo-500 text-white hover:shadow-lg hover:scale-105 group/btn'
-                                                    }`}
-                                                title="Registro Rápido"
-                                            >
-                                                <Plus size={20} strokeWidth={3} className="group-hover/btn:rotate-90 transition-transform" />
-                                            </Link>
+                                            {canQuickRecord ? (
+                                                <Link
+                                                    to={`/residents/${resident.id}/quick-record`}
+                                                    className={`h-10 rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-95 ${resident.status === 'hospitalized' || isNonActive
+                                                        ? 'bg-slate-800 border border-slate-700 text-slate-500 cursor-not-allowed pointer-events-none'
+                                                        : 'bg-indigo-600 hover:bg-indigo-700 border border-indigo-500 text-white hover:shadow-lg hover:scale-105 group/btn'
+                                                        }`}
+                                                    title="Registro Rápido"
+                                                >
+                                                    <Plus size={20} strokeWidth={3} className="group-hover/btn:rotate-90 transition-transform" />
+                                                </Link>
+                                            ) : (
+                                                <div className="bg-slate-800/50 border border-slate-700/50 text-slate-600 h-10 rounded-xl flex items-center justify-center cursor-not-allowed opacity-50" title="Acceso de solo lectura">
+                                                    <Plus size={20} strokeWidth={3} className="opacity-20" />
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 );

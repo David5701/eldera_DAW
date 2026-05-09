@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Card from './Card';
 import Button from './Button';
 import TabbedForm from './TabbedForm';
-import { ArrowLeft, ChevronLeft, ChevronRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, AlertCircle, CheckCircle2, X } from 'lucide-react';
 import api from '../api/axios';
 import DynamicListInput from './DynamicListInput';
 import {
@@ -30,18 +30,18 @@ import { residentSchema } from '../utils/validationSchemas';
 // Canonical 12-Section Structure: Tab 0 (Admin) + 11 Gordon Functional Health Patterns
 // SECTION_PERMISSIONS: Role-Based Access Control Matrix
 const SECTION_PERMISSIONS = {
-    0: ['admin', 'director', 'nurse'], // 0. Identificación y Administración
-    1: ['doctor', 'nurse', 'admin', 'director'], // P1: Salud (Clinical)
-    2: ['nurse', 'doctor', 'aux', 'admin', 'director'], // P2: Nutricional
-    3: ['nurse', 'aux', 'admin', 'director'], // P3: Eliminación
-    4: ['physio', 'nurse', 'doctor', 'aux', 'admin', 'director'], // P4: Actividad
-    5: ['nurse', 'doctor', 'aux', 'admin', 'director'], // P5: Sueño
-    6: ['psych', 'doctor', 'nurse', 'admin', 'director'], // P6: Cognitivo (Sensitive)
-    7: ['psych', 'social', 'nurse', 'admin', 'director'], // P7: Autopercepción
-    8: ['social', 'nurse', 'admin', 'director'], // P8: Rol y Relaciones
-    9: ['doctor', 'nurse', 'admin', 'director'], // P9: Sexualidad (Sensitive)
-    10: ['psych', 'nurse', 'admin', 'director'], // P10: Adaptación (Sensitive)
-    11: ['social', 'admin', 'nurse', 'director'] // P11: Valores y Creencias
+    0: ['admin', 'director', 'nurse', 'doctor'], // 0. Identificación y Administración (No aux)
+    1: ['admin', 'director', 'nurse', 'doctor'], // P1: Salud (Clinical)
+    2: ['admin', 'director', 'nurse', 'doctor', 'aux'], // P2: Nutricional
+    3: ['admin', 'director', 'nurse', 'doctor', 'aux'], // P3: Eliminación
+    4: ['admin', 'director', 'nurse', 'doctor', 'aux', 'physiotherapist'], // P4: Actividad
+    5: ['admin', 'director', 'nurse', 'doctor', 'aux'], // P5: Sueño
+    6: ['admin', 'director', 'nurse', 'doctor', 'occupational_therapist'], // P6: Cognitivo
+    7: ['admin', 'director', 'nurse', 'doctor', 'social_worker'], // P7: Autopercepción
+    8: ['admin', 'director', 'nurse', 'doctor', 'social_worker'], // P8: Rol y Relaciones
+    9: ['admin', 'director', 'nurse', 'doctor'], // P9: Sexualidad
+    10: ['admin', 'director', 'nurse', 'doctor'], // P10: Adaptación
+    11: ['admin', 'director', 'nurse', 'doctor', 'social_worker'] // P11: Valores y Creencias
 };
 
 // Spanish labels for error messages
@@ -116,14 +116,17 @@ const FIELD_TAB_MAP = {
  * - Sincronización automática de números de emergencia según tipo de cobertura.
  */
 export default function ResidentForm({ onSubmit, onCancel, initialData, initialTab = 0, isModal = false, isSubmitting = false }) {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const { addToast } = useToast();
     const location = useLocation();
-    const currentUserRole = user?.role || 'aux'; // Rol por defecto (mínimo privilegio)
+    const currentUserRole = (user?.role || 'aux').toLowerCase().trim();
 
     // Matriz de permisos: Determina qué roles pueden editar cada sección.
     // Sigue el principio de "Lógica de negocio soberana" definida en GEMINI.md.
     const canEditSection = (tabIndex) => {
+        // Mientras carga el auth, no bloqueamos drásticamente pero tampoco permitimos.
+        if (authLoading) return false;
+
         // Los administradores tienen acceso total.
         if (currentUserRole === 'admin') return true;
 
@@ -248,6 +251,11 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
         has_material_allergy: false,
         allergy_type: '',
         no_known_allergies: false,
+        sexuality_observations: '',
+        emotional_state: '',
+        family_situation: '',
+        first_impressions: '',
+        care_plan: '',
 
         // === MOVILIDAD ===
         mobility_level: '',
@@ -366,8 +374,8 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
         family_situation: ''
     });
 
-    const [, setLoading] = useState(false);
-    const [, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [errors, setErrors] = useState({}); // Field-level validation errors
     const [originalData, setOriginalData] = useState({}); // Store original sanitized data for diffing
 
@@ -1993,11 +2001,11 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                 <button
                     type="submit"
                     form="resident-form"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || loading}
                     className={`bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg rounded-2xl w-9 h-9 md:w-12 md:h-12 flex items-center justify-center transition-all active:scale-95 disabled:opacity-50 shrink-0`}
-                    title={isSubmitting ? "Guardando..." : "Guardar Cambios"}
+                    title={isSubmitting || loading ? "Guardando..." : "Guardar Cambios"}
                 >
-                    {isSubmitting ? (
+                    {isSubmitting || loading ? (
                         <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
                         <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6" />
@@ -2019,6 +2027,20 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
             {/* Scrollable Content Area */}
             <div ref={contentRef} className="flex-1 overflow-y-auto p-3 md:p-6 lg:p-8 bg-slate-50/50">
                 <div className="max-w-7xl mx-auto">
+                    {/* Error Message Display */}
+                    {error && (
+                        <div className="mb-6 bg-red-50 border-2 border-red-200 text-red-700 px-6 py-4 rounded-2xl flex items-start gap-3 animate-in fade-in slide-in-from-top-4">
+                            <AlertCircle className="w-6 h-6 shrink-0 mt-0.5" />
+                            <div className="flex-1">
+                                <p className="font-bold text-sm uppercase tracking-wider mb-1">Se han encontrado errores</p>
+                                <p className="text-sm opacity-90 whitespace-pre-wrap">{error}</p>
+                            </div>
+                            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600 transition-colors">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                    )}
+
                     <form id="resident-form" onSubmit={handleSubmit} className="space-y-6">
                         {tabs[activeTab]?.content}
                     </form>

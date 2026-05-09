@@ -20,9 +20,9 @@ import api from '../api/axios';
 import { useToast } from './Toast';
 import { useAuth } from '../context/AuthContext';
 
-const CATEGORIES = [
-    { id: 'vitals', label: 'Constantes', icon: Activity, color: 'text-rose-700', bg: 'bg-rose-100', borderColor: 'border-rose-200' },
-    { id: 'care', label: 'Cuidados', icon: CheckCircle2, color: 'text-amber-800', bg: 'bg-amber-100', borderColor: 'border-amber-200' },
+const ALL_CATEGORIES = [
+    { id: 'vitals', label: 'Constantes', icon: Activity, color: 'text-rose-700', bg: 'bg-rose-100', borderColor: 'border-rose-200', allowedRoles: ['admin', 'director', 'doctor', 'nurse'] },
+    { id: 'care', label: 'Cuidados', icon: CheckCircle2, color: 'text-amber-800', bg: 'bg-amber-100', borderColor: 'border-amber-200', allowedRoles: ['admin', 'director', 'doctor', 'nurse', 'aux'] },
 ];
 
 const VITAL_TYPES = [
@@ -44,10 +44,20 @@ const CARE_TYPES = [
     { id: 'vomiting', label: 'Vómitos', options: ['Poco', 'Moderado', 'Abundante'], icon: Activity, color: 'text-rose-600', bg: 'bg-rose-50', hoverBorder: 'hover:border-rose-500', activeColor: 'text-rose-700' },
 ];
 
+const ROLE_LABELS = {
+    admin: 'Administrador',
+    director: 'Director',
+    nurse: 'Enfermería',
+    doctor: 'Médico',
+    aux: 'Auxiliar',
+    social_worker: 'Trabajo Social',
+    physiotherapist: 'Fisioterapia',
+    occupational_therapist: 'Terapia Ocupacional'
+};
+
 export default function QuickCareRecord({ onBack, residents = [], initialResident = null, hideHeader = false }) {
     const [selectedResident, setSelectedResident] = useState(initialResident);
     const [searchTerm, setSearchTerm] = useState('');
-    const [category, setCategory] = useState('vitals');
     const [submitting, setSubmitting] = useState(false);
     const [successFeedback, setSuccessFeedback] = useState({});
     
@@ -57,6 +67,13 @@ export default function QuickCareRecord({ onBack, residents = [], initialResiden
 
     const { addToast } = useToast();
     const { user } = useAuth();
+
+    const CATEGORIES = ALL_CATEGORIES.filter(cat => cat.allowedRoles.includes(user?.role));
+    const [category, setCategory] = useState(() => {
+        if (user?.role === 'aux') return 'care';
+        if (CATEGORIES.length > 0) return CATEGORIES[0].id;
+        return 'vitals';
+    });
 
     const filteredResidents = residents.filter(r =>
         `${r.name} ${r.surname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -112,6 +129,36 @@ export default function QuickCareRecord({ onBack, residents = [], initialResiden
         }
     };
 
+    if (CATEGORIES.length === 0) {
+        return (
+            <div className="bg-white rounded-[2rem] border-2 border-[#0F172A] shadow-sm overflow-hidden">
+                <div className="flex items-center gap-4 px-6 py-4 border-b border-slate-200">
+                    <button 
+                        type="button"
+                        onClick={onBack} 
+                        className="w-10 h-10 bg-[#0F172A] hover:bg-slate-800 text-white rounded-full flex items-center justify-center transition-all shadow-md shrink-0"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                    </button>
+                    <h2 className="text-lg font-black text-slate-800 uppercase tracking-tight">Registro Rápido</h2>
+                </div>
+                <div className="p-6 md:p-12 text-center space-y-6">
+                    <div className="w-20 h-20 bg-rose-50 text-rose-600 rounded-[2rem] flex items-center justify-center mx-auto mb-4 border-2 border-rose-100">
+                        <Lock className="w-10 h-10" />
+                    </div>
+                    <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Acceso Restringido</h3>
+                    <p className="text-slate-500 font-medium max-w-sm mx-auto">Su perfil profesional ({ROLE_LABELS[user?.role] || user?.role || 'No Asistencial'}) no tiene permisos para realizar registros clínicos en este módulo.</p>
+                    <button 
+                        onClick={onBack}
+                        className="px-10 py-4 bg-[#0F172A] text-white rounded-2xl font-black uppercase tracking-wider hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl active:scale-95"
+                    >
+                        Entendido
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     if (!selectedResident) {
         return (
             <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -128,7 +175,8 @@ export default function QuickCareRecord({ onBack, residents = [], initialResiden
                     </div>
 
                     <div className="p-6 md:p-8">
-                        <div className="max-w-md mx-auto space-y-6">
+                        ) : (
+                            <div className="max-w-md mx-auto space-y-6">
                             <div className="text-center space-y-2">
                                 <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                     <Activity className="w-8 h-8" />
@@ -170,8 +218,8 @@ export default function QuickCareRecord({ onBack, residents = [], initialResiden
                                         <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-all group-hover:translate-x-1" />
                                     </button>
                                 ))}
+                                </div>
                             </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -328,9 +376,7 @@ export default function QuickCareRecord({ onBack, residents = [], initialResiden
                                         type="number"
                                         step="any"
                                         placeholder="0.0"
-                                        className={`w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-2 py-3 text-base md:text-xl font-black text-slate-800 outline-none focus:bg-white ${vital.focusBorder} focus:ring-4 focus:ring-slate-50 transition-all placeholder:text-slate-200 text-center ${user.role === 'aux' && vital.id !== 'temperature' ? 'opacity-50 cursor-not-allowed' : ''
-                                            }`}
-                                        disabled={user.role === 'aux' && vital.id !== 'temperature'}
+                                        className={`w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-2 py-3 text-base md:text-xl font-black text-slate-800 outline-none focus:bg-white ${vital.focusBorder} focus:ring-4 focus:ring-slate-50 transition-all placeholder:text-slate-200 text-center`}
                                         onKeyPress={(e) => {
                                             if (e.key === 'Enter') {
                                                 handleRecordVital(vital.id, e.target.value).then(success => {
@@ -350,7 +396,7 @@ export default function QuickCareRecord({ onBack, residents = [], initialResiden
                                             ? 'bg-emerald-500 text-white shadow-emerald-200'
                                             : `${vital.buttonBg} text-white hover:brightness-110 shadow-slate-200`
                                             }`}
-                                        disabled={submitting || (user.role === 'aux' && vital.id !== 'temperature')}
+                                        disabled={submitting}
                                     >
                                         <CheckCircle2 className="w-6 h-6 md:w-8 md:h-8" strokeWidth={2.5} />
                                     </button>

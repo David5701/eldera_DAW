@@ -37,7 +37,7 @@ const ResidentStatusCarousel = ({ stats, navigate }) => {
             color: 'amber',
             cardLink: '/residents?view=cards&status=hospitalized',
             actionText: 'Ver Todos',
-            actionLink: '/residents?view=cards&status=hospitalized'
+            actionLink: '/hospitalized'
         },
         {
             title: 'Bajas Temporales',
@@ -65,7 +65,7 @@ const ResidentStatusCarousel = ({ stats, navigate }) => {
             subtitle: 'Histórico Completo',
             icon: Users,
             color: 'slate',
-            cardLink: '/residents?view=list&status=all'
+            cardLink: '/residents?view=cards&status=all'
         }
     ];
 

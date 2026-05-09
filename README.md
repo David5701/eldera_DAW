@@ -10,11 +10,17 @@ El sistema se fundamenta en tres pilares de ingeniería:
 2.  **Seguridad "Zero Footprint" (BYOD)**: Los datos de salud (PHI) residen exclusivamente en memoria volátil (RAM), sin persistencia en el dispositivo cliente.
 3.  **Contexto por Rol**: La interfaz se adapta dinámicamente al perfil del profesional (Enfermería, Medicina, Fisioterapia, etc.).
 
+## ✨ Características Principales
+
+*   **Perfil Integral del Residente**: Gestión bio-psico-social estructurada en los 11 Patrones Funcionales de Salud de Marjory Gordon.
+*   **Módulo Quick Care**: Interfaz ágil para el registro en tiempo real de constantes vitales y cuidados diarios.
+*   **Control de Acceso (RBAC) Granular**: Visualización colaborativa de datos y restricción de edición basada en competencias.
+
 ## 🛠️ Stack Tecnológico
 
 *   **Frontend**: SPA desarrollada con **React 19**, utilizando **Vite** y **Tailwind CSS**.
 *   **Backend**: API asíncrona construida con **FastAPI** (Python 3.11+) y **uv** para la gestión de dependencias.
-*   **Persistencia**: **PostgreSQL 15** con arquitectura multi-tenant nativa.
+*   **Persistencia**: **PostgreSQL 15** gestionado con **SQLAlchemy** y migraciones automáticas con **Alembic**.
 *   **Infraestructura**: Contenerización completa mediante **Docker** y **Docker Compose**.
 
 ## 📁 Estructura del Proyecto
@@ -75,14 +81,32 @@ Es obligatorio configurar las siguientes variables de entorno en el panel de Ren
 *   **Documentación API**: [http://localhost:8085/docs](http://localhost:8085/docs)
 
 ### Credenciales de Acceso (Desarrollo)
-| Usuario | Contraseña | Perfil |
-|---------|------------|--------|
-| `admin` | `admin123` | Administrador |
-| `director1` | `director123` | Dirección |
-| `nurse1` | `nurse123` | Enfermería |
-| `doctor_test` | `eldera2024` | Medicina |
-| `social_test` | `eldera2024` | Trabajo Social |
-| `physio_test` | `eldera2024` | Fisioterapia |
+
+| Usuario | Contraseña | Rol (Sistema) |
+| :--- | :--- | :--- |
+| `admin` | `admin123` | Administrador (`admin`) |
+| `director1` | `director123` | Dirección (`director`) |
+| `nurse1` | `nurse123` | Enfermería (`nurse`) |
+| `doctor_test` | `eldera2024` | Medicina (`doctor`) |
+| `aux1` | `aux123` | Auxiliar (`aux`) |
+| `social_test` | `eldera2024` | Trabajo Social (`social_worker`) |
+| `physio_test` | `eldera2024` | Fisioterapia (`physiotherapist`) |
+| `occupational_test` | `eldera2024` | Terapia Ocupacional (`occupational_therapist`) |
+
+## 🛡️ Matriz de Permisos (RBAC)
+
+El acceso a las funcionalidades clínicas está estrictamente regulado según el perfil profesional. **Todos los profesionales pueden visualizar el perfil completo del residente (constantes, cuidados, etc.)**, pero la capacidad de modificación está limitada:
+
+| Módulo (Permiso de Edición) | Admin/Dirección | Medicina/Enfermería | Auxiliares | Técnicos (Social/Fisio/TO) |
+|--------|:---------------:|:-------------------:|:----------:|:--------------------------:|
+| **Registro de Constantes** | ✅ | ✅ | ❌ | ❌ |
+| **Registro de Cuidados** | ✅ | ✅ | ✅ | ❌ |
+| **Perfil: Datos Base / Pautas** | ✅ | ✅ | ❌ | ❌ |
+| **Perfil: Patrones Funcionales**| ✅ | ✅ | ⚠️ (Limitado) | ⚠️ (Secciones específicas) |
+| **Exportación PDF/Datos** | ✅ | ❌ | ❌ | ❌ |
+
+> [!NOTE]
+> Los auxiliares tienen permiso para registrar cuidados diarios, mientras que la toma de constantes está reservada a personal médico/enfermería. Los perfiles técnicos (Trabajo Social, Fisioterapia, Terapia Ocupacional) acceden a la visualización global pero solo pueden editar las secciones del formulario de valoración correspondientes a su especialidad.
 
 ## 🛡️ Calidad de Código
 El proyecto utiliza **Ruff** para linting y **Pytest** para pruebas:

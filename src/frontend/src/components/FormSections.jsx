@@ -1210,9 +1210,8 @@ export const PermissionsSection = ({ formData, handleChange }) => (
                             <option value="">Seleccionar...</option>
                             <option value="abdominal">Cinturón Abdominal (Cama)</option>
                             <option value="pelvic">Cinturón Pélvico (Silla)</option>
-                            <option value="wrist">Muñequeras</option>
-                            <option value="bars">Barandillas x2</option>
-                            <option value="safety_sheet">Sábana de Seguridad</option>
+                            <option value="muñequeras">Muñequeras</option>
+                            <option value="barandillas">Barandillas x2</option>
                         </select>
 
                     </div>
@@ -1285,7 +1284,7 @@ export const RelacionesSection = ({ formData, handleChange, handleBlur }) => (
 export const ObservationsSection = ({ formData, handleChange, handleBlur }) => (
     <div className="space-y-6">
         <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Primeras Impresiones y Notas de Ingreso</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Observaciones</label>
             <textarea
                 name="first_impressions"
                 value={formData.first_impressions || ''}
@@ -1293,7 +1292,7 @@ export const ObservationsSection = ({ formData, handleChange, handleBlur }) => (
                 onBlur={handleBlur}
                 rows="4"
                 className="w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-teal-500 outline-none"
-                placeholder="Observaciones generales sobre el estado al ingreso..."
+                placeholder="Observaciones generales del enfermero..."
             ></textarea>
         </div>
 
@@ -1373,12 +1372,19 @@ export const SleepSection = ({ formData, handleChange }) => {
 
 export const SexualitySection = ({ formData, handleChange }) => (
     <div className="space-y-4">
-        <div className="bg-rose-50 border-l-4 border-rose-500 p-4 mb-6 rounded-lg">
-            <p className="text-sm text-rose-700 font-bold">Patrón 9: Sexualidad y Reproducción</p>
-            <p className="text-xs text-rose-600 mt-1">Aspectos relacionados con sexualidad, intimidad y afectividad</p>
-        </div>
-        <div className="space-y-4">
-            <p className="text-sm text-slate-500 italic">No hay campos adicionales requeridos para este patrón en el modelo actual.</p>
+        <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Observaciones sobre Sexualidad e Intimidad</label>
+            <textarea
+                name="sexuality_observations"
+                value={formData.sexuality_observations || ''}
+                onChange={handleChange}
+                rows="4"
+                placeholder="Valoración de la satisfacción, preocupaciones, afectividad, intimidad..."
+                className="w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-rose-500 outline-none"
+            />
+            <p className="text-xs text-slate-500 italic mt-2">
+                ℹ️ Describa aspectos relevantes sobre la esfera sexual y afectiva del residente.
+            </p>
         </div>
     </div>
 );
