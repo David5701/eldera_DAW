@@ -48,6 +48,10 @@ eldera-daw/
 
 ## 🚀 Instalación y Despliegue
 
+Para obtener instrucciones detalladas sobre cómo ejecutar, probar y validar el proyecto (incluyendo credenciales de prueba), consulte el documento:
+
+👉 **[INSTRUCCIONES_EJECUCION.md](./INSTRUCCIONES_EJECUCION.md)**
+
 ### 1. Despliegue de Servicios
 ```bash
 # Construir e iniciar el stack completo
@@ -90,7 +94,6 @@ Es obligatorio configurar las siguientes variables de entorno en el panel de Ren
 | Usuario | Contraseña | Rol (Sistema) |
 | :--- | :--- | :--- |
 | `admin` | `admin123` | Administrador (`admin`) |
-| `director1` | `director123` | Dirección (`director`) |
 | `nurse1` | `nurse123` | Enfermería (`nurse`) |
 | `doctor_test` | `eldera2024` | Medicina (`doctor`) |
 | `aux1` | `aux123` | Auxiliar (`aux`) |
@@ -103,7 +106,7 @@ Es obligatorio configurar las siguientes variables de entorno en el panel de Ren
 
 El acceso a las funcionalidades clínicas está estrictamente regulado según el perfil profesional. **Todos los profesionales pueden visualizar el perfil completo del residente (constantes, cuidados, etc.)**, pero la capacidad de modificación está limitada:
 
-| Módulo (Permiso de Edición) | Admin/Dirección | Medicina/Enfermería | Auxiliares | Técnicos (Social/Fisio/TO/Psi) |
+| Módulo (Permiso de Edición) | Admin | Medicina/Enfermería | Auxiliares | Técnicos (Social/Fisio/TO/Psi) |
 |--------|:---------------:|:-------------------:|:----------:|:--------------------------:|
 | **Registro de Constantes** | ✅ | ✅ | ❌ | ❌ |
 | **Registro de Cuidados** | ✅ | ✅ | ✅ | ❌ |

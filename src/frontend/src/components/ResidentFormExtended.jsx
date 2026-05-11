@@ -124,8 +124,8 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
     // Matriz de permisos: Determina qué roles pueden editar cada sección.
     // Sigue el principio de "Lógica de negocio soberana" definida en GEMINI.md.
     const canEditSection = (sectionId) => {
-        // Tab 0 (Identificación) is strictly for Admin
-        if (sectionId === 0 && user?.role !== 'admin') return false;
+        // Tab 0 (Identificación) is for Admin, Nurse and Doctor
+        if (sectionId === 0 && !['admin', 'nurse', 'doctor'].includes(currentUserRole)) return false;
 
         if (user?.role === 'admin') return true;
 
@@ -1272,9 +1272,10 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                                     value={formData.name}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
+                                    disabled={currentUserRole !== 'admin'}
                                     required
                                     placeholder="Ej: Josefa"
-                                    className={`w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-[#1E82E5] focus:bg-white outline-none transition-all font-medium ${errors.name ? 'border-red-500' : 'border-slate-200'}`}
+                                    className={`w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-[#1E82E5] focus:bg-white outline-none transition-all font-medium ${errors.name ? 'border-red-500' : 'border-slate-200'} ${currentUserRole !== 'admin' ? 'cursor-not-allowed opacity-75' : ''}`}
                                 />
                                 {errors.name && <p className="text-red-500 text-xs mt-1 font-medium">{errors.name}</p>}
                             </div>
@@ -1286,9 +1287,10 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                                     value={formData.surname}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
+                                    disabled={currentUserRole !== 'admin'}
                                     required
                                     placeholder="Ej: García López"
-                                    className={`w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-[#1E82E5] focus:bg-white outline-none transition-all font-medium ${errors.surname ? 'border-red-500' : 'border-slate-200'}`}
+                                    className={`w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-[#1E82E5] focus:bg-white outline-none transition-all font-medium ${errors.surname ? 'border-red-500' : 'border-slate-200'} ${currentUserRole !== 'admin' ? 'cursor-not-allowed opacity-75' : ''}`}
                                 />
                                 {errors.surname && <p className="text-red-500 text-xs mt-1 font-medium">{errors.surname}</p>}
                             </div>
@@ -1299,7 +1301,8 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                                         name="document_type"
                                         value={formData.document_type || 'DNI'}
                                         onChange={handleChange}
-                                        className="w-full px-2 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#1E82E5] outline-none text-xs md:text-sm font-medium"
+                                        disabled={currentUserRole !== 'admin'}
+                                        className={`w-full px-2 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#1E82E5] outline-none text-xs md:text-sm font-medium ${currentUserRole !== 'admin' ? 'cursor-not-allowed opacity-75' : ''}`}
                                     >
                                         <option value="DNI">DNI</option>
                                         <option value="NIE">NIE</option>
@@ -1312,13 +1315,14 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                                         value={formData.dni_nie || ''}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
+                                        disabled={currentUserRole !== 'admin'}
                                         autoComplete="off"
                                         placeholder={
                                             formData.document_type === 'DNI' ? "00000000X" :
                                                 formData.document_type === 'NIE' ? "X0000000A" :
                                                     "Documento..."
                                         }
-                                        className={`w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-[#1E82E5] outline-none font-medium ${errors.dni_nie ? 'border-red-500 bg-red-50' : 'border-slate-200'}`}
+                                        className={`w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-[#1E82E5] outline-none font-medium ${errors.dni_nie ? 'border-red-500 bg-red-50' : 'border-slate-200'} ${currentUserRole !== 'admin' ? 'cursor-not-allowed opacity-75' : ''}`}
                                     />
                                 </div>
                                 {errors.dni_nie && <p className="text-red-500 text-xs mt-1 font-medium">{errors.dni_nie}</p>}
@@ -1331,7 +1335,8 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                                     value={formData.date_of_birth}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    className={`w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-[#1E82E5] outline-none ${errors.date_of_birth ? 'border-red-500' : 'border-slate-200'}`}
+                                    disabled={currentUserRole !== 'admin'}
+                                    className={`w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-[#1E82E5] outline-none ${errors.date_of_birth ? 'border-red-500' : 'border-slate-200'} ${currentUserRole !== 'admin' ? 'cursor-not-allowed opacity-75' : ''}`}
                                 />
                                 {errors.date_of_birth && <p className="text-red-500 text-xs mt-1 font-medium">{errors.date_of_birth}</p>}
                             </div>
@@ -1342,7 +1347,8 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                                     value={formData.sex || ''}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    className={`w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-[#1E82E5] outline-none ${errors.sex ? 'border-red-500' : 'border-slate-200'}`}
+                                    disabled={currentUserRole !== 'admin'}
+                                    className={`w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-[#1E82E5] outline-none ${errors.sex ? 'border-red-500' : 'border-slate-200'} ${currentUserRole !== 'admin' ? 'cursor-not-allowed opacity-75' : ''}`}
                                 >
                                     <option value="">Seleccionar...</option>
                                     <option value="M">Masculino</option>
@@ -1377,9 +1383,10 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                                     name="admission_date"
                                     value={formData.admission_date || new Date().toISOString().split('T')[0]}
                                     onChange={handleChange}
+                                    disabled={currentUserRole !== 'admin'}
                                     required
                                     max="2099-12-31" // Permitir fechas futuras y evitar bloqueos por zona horaria
-                                    className="w-full px-4 py-3 bg-white border border-[#1E82E5]/30 rounded-xl focus:ring-2 focus:ring-[#1E82E5] font-medium outline-none"
+                                    className={`w-full px-4 py-3 bg-white border border-[#1E82E5]/30 rounded-xl focus:ring-2 focus:ring-[#1E82E5] font-medium outline-none ${currentUserRole !== 'admin' ? 'cursor-not-allowed opacity-75' : ''}`}
                                 />
                             </div>
                             <div>
@@ -1389,7 +1396,8 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                                     name="admission_time"
                                     value={formData.admission_time || '10:00'}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-white border border-[#1E82E5]/30 rounded-xl focus:ring-2 focus:ring-[#1E82E5] font-medium outline-none"
+                                    disabled={currentUserRole !== 'admin'}
+                                    className={`w-full px-4 py-3 bg-white border border-[#1E82E5]/30 rounded-xl focus:ring-2 focus:ring-[#1E82E5] font-medium outline-none ${currentUserRole !== 'admin' ? 'cursor-not-allowed opacity-75' : ''}`}
                                 />
                             </div>
                         </div>
