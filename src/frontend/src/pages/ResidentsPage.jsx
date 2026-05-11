@@ -209,7 +209,7 @@ const ResidentsPage = () => {
             <style>{`
                 @media print {
                     @page { margin: 1.5cm; size: A4; }
-                    body { background: white !important; }
+                    body { background: #dbeafe !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                     .print\:hidden, nav, header, aside, .dashboard-sidebar, .dashboard-header { display: none !important; }
                     main { padding: 0 !important; margin: 0 !important; }
                     .shadow-sm, .shadow-md, .shadow-lg { box-shadow: none !important; }

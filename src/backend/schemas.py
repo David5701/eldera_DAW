@@ -99,6 +99,7 @@ class UserBase(BaseModel):
         "social_worker",
         "occupational_therapist",
         "physiotherapist",
+        "psychologist",
     ] = "aux"
 
 

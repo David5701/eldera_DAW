@@ -132,24 +132,24 @@ const NortonCalculator = ({ value, onChange }) => {
                             {NORTON_SCALES.map((scale) => (
                                 <div key={scale.id} className="space-y-2">
                                     <h4 className="font-bold text-slate-700 text-sm uppercase tracking-wide border-b border-slate-100 pb-1">{scale.label}</h4>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <div className="grid grid-cols-2 gap-1.5 md:gap-2">
                                         {scale.options.map((opt) => (
                                             <button
                                                 type="button"
                                                 key={opt.value}
                                                 onClick={() => handleSelect(scale.id, opt.value)}
-                                                className={`text-left p-3 rounded-xl border transition-all ${scores[scale.id] === opt.value
-                                                    ? 'bg-indigo-50 border-indigo-500 ring-1 ring-indigo-500'
+                                                className={`text-left p-2 md:p-3 rounded-xl border transition-all ${scores[scale.id] === opt.value
+                                                    ? 'bg-indigo-50 border-indigo-500 ring-1 ring-indigo-500 shadow-sm'
                                                     : 'bg-white border-slate-200 hover:border-indigo-200 hover:bg-slate-50'
                                                     }`}
                                             >
-                                                <div className="flex justify-between items-center mb-1">
-                                                    <span className={`font-bold text-sm ${scores[scale.id] === opt.value ? 'text-indigo-700' : 'text-slate-700'}`}>
+                                                <div className="flex justify-between items-center mb-0.5">
+                                                    <span className={`font-black text-[10px] md:text-sm uppercase tracking-tight leading-none ${scores[scale.id] === opt.value ? 'text-indigo-700' : 'text-slate-700'}`}>
                                                         {opt.label}
                                                     </span>
-                                                    {scores[scale.id] === opt.value && <Check className="w-4 h-4 text-indigo-600" />}
+                                                    {scores[scale.id] === opt.value && <Check className="w-3 h-3 md:w-4 md:h-4 text-indigo-600" />}
                                                 </div>
-                                                <p className="text-xs text-slate-500 leading-snug">{opt.desc}</p>
+                                                <p className="text-[9px] md:text-xs text-slate-500 leading-tight opacity-80">{opt.desc}</p>
                                             </button>
                                         ))}
                                     </div>

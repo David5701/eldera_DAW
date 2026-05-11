@@ -61,11 +61,10 @@ export default function Header({ onMenuClick, extraContent }) {
                                         return role === 'admin' ? 'Administrador' : 
                                                role === 'nurse' ? 'Enfermería' : 
                                                role === 'aux' ? 'Auxiliar' : 
-                                               role === 'doctor' ? 'Médico' :
-                                               role === 'director' ? 'Director' :
                                                role === 'social_worker' ? 'Trabajo Social' :
                                                role === 'physiotherapist' ? 'Fisioterapia' :
                                                role === 'occupational_therapist' ? 'Terapia Ocupacional' :
+                                               role === 'psychologist' ? 'Psicólogo' :
                                                user?.role || 'Personal';
                                     })()}
                                 </p>
@@ -90,11 +89,10 @@ export default function Header({ onMenuClick, extraContent }) {
                                             {user?.role === 'admin' ? 'Administrador' : 
                                              user?.role === 'nurse' ? 'Enfermería' : 
                                              user?.role === 'aux' ? 'Auxiliar' : 
-                                             user?.role === 'doctor' ? 'Médico' :
-                                             user?.role === 'director' ? 'Director' :
                                              user?.role === 'social_worker' ? 'Trabajo Social' :
                                              user?.role === 'physiotherapist' ? 'Fisioterapia' :
                                              user?.role === 'occupational_therapist' ? 'Terapia Ocupacional' :
+                                             user?.role === 'psychologist' ? 'Psicólogo' :
                                              user?.role || 'Personal'}
                                         </p>
                                     </div>

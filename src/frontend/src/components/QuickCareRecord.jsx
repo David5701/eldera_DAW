@@ -21,8 +21,8 @@ import { useToast } from './Toast';
 import { useAuth } from '../context/AuthContext';
 
 const ALL_CATEGORIES = [
-    { id: 'vitals', label: 'Constantes', icon: Activity, color: 'text-rose-700', bg: 'bg-rose-100', borderColor: 'border-rose-200', allowedRoles: ['admin', 'director', 'doctor', 'nurse'] },
-    { id: 'care', label: 'Cuidados', icon: CheckCircle2, color: 'text-amber-800', bg: 'bg-amber-100', borderColor: 'border-amber-200', allowedRoles: ['admin', 'director', 'doctor', 'nurse', 'aux'] },
+    { id: 'vitals', label: 'Constantes', icon: Activity, color: 'text-rose-700', bg: 'bg-rose-100', borderColor: 'border-rose-200', allowedRoles: ['admin', 'doctor', 'nurse'] },
+    { id: 'care', label: 'Cuidados', icon: CheckCircle2, color: 'text-amber-800', bg: 'bg-amber-100', borderColor: 'border-amber-200', allowedRoles: ['admin', 'doctor', 'nurse', 'aux'] },
 ];
 
 const VITAL_TYPES = [
@@ -46,7 +46,6 @@ const CARE_TYPES = [
 
 const ROLE_LABELS = {
     admin: 'Administrador',
-    director: 'Director',
     nurse: 'Enfermería',
     doctor: 'Médico',
     aux: 'Auxiliar',

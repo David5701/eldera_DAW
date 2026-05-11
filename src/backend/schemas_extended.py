@@ -245,8 +245,10 @@ class ResidentBaseExtended(BaseModel, ResidentValidatorMixin):
     last_hospital_visit: Optional[date] = None
     last_hospital_visit_type: Optional[str] = None
 
-    # Antecedentes médicos (JSON)
+    # Antecedentes médicos
     medical_history: list[dict[str, Any]] = []
+    surgical_history: Optional[str] = None
+    other_diseases: Optional[str] = None
 
     # insurance_type: removed (not in DB)
     # health_center_name: removed (not in DB)
@@ -538,6 +540,8 @@ class ResidentUpdateExtended(BaseModel, ResidentValidatorMixin):
     last_hospital_visit: Optional[date] = None
     last_hospital_visit_type: Optional[str] = None
     medical_history: Optional[list[dict[str, Any]]] = None
+    surgical_history: Optional[str] = None
+    other_diseases: Optional[str] = None
 
     # Diagnoses
     diagnosis_hypertension: Optional[bool] = None

@@ -41,6 +41,49 @@ export const MobilitySection = ({ formData, handleChange }) => (
         </div>
 
         <div>
+            <h3 className="text-lg font-semibold text-slate-800 mb-4">Prevención de UPP</h3>
+            <div className="bg-orange-50 p-4 rounded-2xl border border-orange-200">
+                <div className="flex items-center space-x-2 mb-4">
+                    <input
+                        type="checkbox"
+                        name="requires_positioning"
+                        checked={formData.requires_positioning}
+                        onChange={handleChange}
+                        className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
+                    />
+                    <label className="font-medium text-slate-800">Precisa Cambios Posturales</label>
+                </div>
+
+                {formData.requires_positioning && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-7">
+                        <div>
+                            <label className="block text-sm text-slate-700 mb-1">Frecuencia (Horas)</label>
+                            <input
+                                type="number"
+                                name="positioning_frequency"
+                                value={formData.positioning_frequency || ''}
+                                onChange={handleChange}
+                                min="1" max="12"
+                                placeholder="Ej: 3"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500"
+                            />
+                        </div>
+                        <div className="flex items-center space-x-2 pt-6">
+                            <input
+                                type="checkbox"
+                                name="uses_anti_bedsore_mattress"
+                                checked={formData.uses_anti_bedsore_mattress}
+                                onChange={handleChange}
+                                className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
+                            />
+                            <label className="text-sm text-slate-700 font-medium">Usa Colchón Antiescaras</label>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+
+        <div>
             <h3 className="text-lg font-semibold text-slate-800 mb-4">Prótesis y Ayudas Sensoriales</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                 {/* Dentaduras */}
@@ -752,7 +795,10 @@ export const CognitiveSection = ({ formData, handleChange }) => (
         </div>
 
         <div>
-            <h3 className="text-lg font-semibold text-slate-800 mb-4">Alteraciones de Conducta</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span className="w-2 h-6 bg-purple-500 rounded-full"></span>
+                Perfil Conductual
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                 {/* Agitacion */}
                 <div className="space-y-2">
@@ -1264,15 +1310,15 @@ export const AutopercepcionSection = ({ formData, handleChange, handleBlur }) =>
 export const RelacionesSection = ({ formData, handleChange, handleBlur }) => (
     <div className="space-y-4">
         <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Situación Familiar y Social</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Situación Familiar</label>
             <textarea
                 name="family_situation"
                 value={formData.family_situation || ''}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                rows="6"
-                placeholder="Estructura familiar, apoyo social, frecuencia de visitas, relación con otros residentes..."
-                className="w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-cyan-500 outline-none"
+                rows="4"
+                placeholder="Composición familiar, frecuencia de visitas, relación con familiares..."
+                className="w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-teal-500 outline-none"
             />
         </div>
     </div>
@@ -1297,7 +1343,7 @@ export const ObservationsSection = ({ formData, handleChange, handleBlur }) => (
         </div>
 
         <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Plan de Cuidados Inicial</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Plan de Cuidados</label>
             <textarea
                 name="care_plan"
                 value={formData.care_plan || ''}

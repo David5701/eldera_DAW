@@ -30,18 +30,18 @@ import { residentSchema } from '../utils/validationSchemas';
 // Canonical 12-Section Structure: Tab 0 (Admin) + 11 Gordon Functional Health Patterns
 // SECTION_PERMISSIONS: Role-Based Access Control Matrix
 const SECTION_PERMISSIONS = {
-    0: ['admin', 'director', 'nurse', 'doctor'], // 0. Identificación y Administración (No aux)
-    1: ['admin', 'director', 'nurse', 'doctor'], // P1: Salud (Clinical)
-    2: ['admin', 'director', 'nurse', 'doctor', 'aux'], // P2: Nutricional
-    3: ['admin', 'director', 'nurse', 'doctor', 'aux'], // P3: Eliminación
-    4: ['admin', 'director', 'nurse', 'doctor', 'aux', 'physiotherapist'], // P4: Actividad
-    5: ['admin', 'director', 'nurse', 'doctor', 'aux'], // P5: Sueño
-    6: ['admin', 'director', 'nurse', 'doctor', 'occupational_therapist'], // P6: Cognitivo
-    7: ['admin', 'director', 'nurse', 'doctor', 'social_worker'], // P7: Autopercepción
-    8: ['admin', 'director', 'nurse', 'doctor', 'social_worker'], // P8: Rol y Relaciones
-    9: ['admin', 'director', 'nurse', 'doctor'], // P9: Sexualidad
-    10: ['admin', 'director', 'nurse', 'doctor'], // P10: Adaptación
-    11: ['admin', 'director', 'nurse', 'doctor', 'social_worker'] // P11: Valores y Creencias
+    0: ['admin', 'nurse', 'doctor'], // 0. Identificación y Administración (No aux)
+    1: ['admin', 'nurse', 'doctor'], // P1: Salud (Clinical)
+    2: ['admin', 'nurse', 'doctor', 'aux'], // P2: Nutricional
+    3: ['admin', 'nurse', 'doctor', 'aux'], // P3: Eliminación
+    4: ['admin', 'nurse', 'doctor', 'aux', 'physiotherapist'], // P4: Actividad
+    5: ['admin', 'nurse', 'doctor', 'aux'], // P5: Sueño
+    6: ['admin', 'nurse', 'doctor', 'occupational_therapist', 'physiotherapist', 'psychologist'], // P6: Cognitivo (Expandido a Psicólogo)
+    7: ['admin', 'nurse', 'doctor', 'social_worker', 'psychologist'], // P7: Autopercepción (Expandido a Psicólogo)
+    8: ['admin', 'nurse', 'doctor', 'social_worker', 'psychologist'], // P8: Rol y Relaciones (Expandido a Psicólogo)
+    9: ['admin', 'nurse', 'doctor'], // P9: Sexualidad
+    10: ['admin', 'nurse', 'doctor', 'physiotherapist'], 
+    11: ['admin', 'nurse', 'doctor', 'social_worker', 'psychologist'] 
 };
 
 // Spanish labels for error messages
@@ -82,7 +82,7 @@ const FIELD_LABELS = {
     mmse_score: 'Puntuación MMSE',
     pfeiffer_score: 'Puntuación Pfeiffer',
     sexuality_observations: 'Observaciones sobre Sexualidad',
-    first_impressions: 'Primeras Impresiones',
+    first_impressions: 'Observaciones',
     emotional_state: 'Estado Emocional',
     family_situation: 'Situación Familiar',
 };
@@ -123,18 +123,21 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
 
     // Matriz de permisos: Determina qué roles pueden editar cada sección.
     // Sigue el principio de "Lógica de negocio soberana" definida en GEMINI.md.
-    const canEditSection = (tabIndex) => {
-        // Mientras carga el auth, no bloqueamos drásticamente pero tampoco permitimos.
-        if (authLoading) return false;
+    const canEditSection = (sectionId) => {
+        // Tab 0 (Identificación) is strictly for Admin
+        if (sectionId === 0 && user?.role !== 'admin') return false;
 
-        // Los administradores tienen acceso total.
-        if (currentUserRole === 'admin') return true;
+        if (user?.role === 'admin') return true;
 
-        // Durante el alta (nuevo residente), enfermería suele tener permisos extendidos.
-        if (!initialData?.id && currentUserRole === 'nurse') return true;
+        const allowedRoles = SECTION_PERMISSIONS[sectionId] || [];
+        const hasAccess = allowedRoles.includes(currentUserRole);
 
-        const allowed = SECTION_PERMISSIONS[tabIndex] || [];
-        return allowed.includes(currentUserRole);
+        // DEBUG LOG: Útil para identificar por qué una sección está bloqueada
+        if (!hasAccess && !authLoading) {
+            console.warn(`Access Denied to Section ${sectionId} for role: ${currentUserRole}`);
+        }
+
+        return hasAccess;
     };
 
     const [activeTab, setActiveTab] = useState(initialTab || 0);
@@ -533,6 +536,14 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
             }
             if (name === 'supplement_renal' && newValue === true) {
                 updated.supplement_hchp = false;
+            }
+
+            // 3. Movilidad: Si es 'encamado', activar automáticamente cambios posturales.
+            if (name === 'mobility_level' && newValue === 'bedridden') {
+                updated.requires_positioning = true;
+                if (!updated.positioning_frequency) {
+                    updated.positioning_frequency = 3; // Sugerencia de 3h por defecto
+                }
             }
 
             return updated;
@@ -966,15 +977,43 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                 </div>
             </div>
 
-            <div className="mt-6 border-t pt-6">
+            <div className="mt-6 border-t pt-6 space-y-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Antecedentes Médicos y Quirúrgicos</h3>
-                <DynamicListInput
-                    label="Historial de Enfermedades y Cirugías Previas"
-                    items={formData.medical_history || []}
-                    onChange={(newItems) => {
-                        setFormData(prev => ({ ...prev, medical_history: newItems }));
-                    }}
-                />
+                
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Otras Enfermedades (Texto)</label>
+                    <textarea
+                        name="other_diseases"
+                        value={formData.other_diseases || ''}
+                        onChange={handleChange}
+                        rows="3"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                        placeholder="Describa otras patologías crónicas o agudas relevantes..."
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Antecedentes Quirúrgicos (Operaciones)</label>
+                    <textarea
+                        name="surgical_history"
+                        value={formData.surgical_history || ''}
+                        onChange={handleChange}
+                        rows="3"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                        placeholder="Liste las intervenciones quirúrgicas previas..."
+                    />
+                </div>
+
+                <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Historial Detallado (Legacy/Listado)</label>
+                    <DynamicListInput
+                        label="Historial de Enfermedades y Cirugías Previas"
+                        items={formData.medical_history || []}
+                        onChange={(newItems) => {
+                            setFormData(prev => ({ ...prev, medical_history: newItems }));
+                        }}
+                    />
+                </div>
             </div>
 
             <h3 className="text-lg font-semibold text-gray-800 mt-6">Diagnósticos Principales</h3>
@@ -1597,7 +1636,9 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                             <option value="hospitalized">Hospitalizado</option>
                             <option value="inactive">Baja Temporal</option>
                             <option value="deceased">Defunción</option>
-                            <option value="deleted" className="text-red-600 font-bold bg-red-50">⚠️ ELIMINAR (Baja Definitiva)</option>
+                            {currentUserRole === 'admin' && (
+                                <option value="deleted" className="text-red-600 font-bold bg-red-50">⚠️ ELIMINAR (Baja Definitiva)</option>
+                            )}
                         </select>
                     </div>
                     {formData.status === 'hospitalized' && (

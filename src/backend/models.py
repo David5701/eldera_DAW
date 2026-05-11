@@ -107,6 +107,8 @@ class Resident(Base):
     # === ANTECEDENTES (JSONB Dinámico) ===
     # Estructura: [{type: 'disease'|'surgery', name: str, year: str, status: str}]
     medical_history = Column(JSON_TYPE, default=list)
+    surgical_history = Column(Text, nullable=True)
+    other_diseases = Column(Text, nullable=True)
 
     # === DIAGNÓSTICOS PRINCIPALES (CHECKBOXES para listados rápidos) ===
     diagnosis_hypertension = Column(Boolean, default=False, index=True)

@@ -80,9 +80,10 @@ Es obligatorio configurar las siguientes variables de entorno en el panel de Ren
 *   Docker Compose v2.0+
 *   8GB RAM Recomendados
 
-## 💻 Acceso al Sistema
-*   **Interfaz de Usuario**: [http://localhost:5180](http://localhost:5180)
-*   **Documentación API**: [http://localhost:8085/docs](http://localhost:8085/docs)
+## 🌐 Acceso al Sistema
+*   **Producción (Render)**: [https://eldera-web-daw.onrender.com/]
+*   **Interfaz de Usuario (Local)**: [http://localhost:5180](http://localhost:5180)
+*   **Documentación API (Local)**: [http://localhost:8085/docs](http://localhost:8085/docs)
 
 ### Credenciales de Acceso (Desarrollo)
 
@@ -96,12 +97,13 @@ Es obligatorio configurar las siguientes variables de entorno en el panel de Ren
 | `social_test` | `eldera2024` | Trabajo Social (`social_worker`) |
 | `physio_test` | `eldera2024` | Fisioterapia (`physiotherapist`) |
 | `occupational_test` | `eldera2024` | Terapia Ocupacional (`occupational_therapist`) |
+| `psi1` | `psi123` | Psicología (`psychologist`) |
 
 ## 🛡️ Matriz de Permisos (RBAC)
 
 El acceso a las funcionalidades clínicas está estrictamente regulado según el perfil profesional. **Todos los profesionales pueden visualizar el perfil completo del residente (constantes, cuidados, etc.)**, pero la capacidad de modificación está limitada:
 
-| Módulo (Permiso de Edición) | Admin/Dirección | Medicina/Enfermería | Auxiliares | Técnicos (Social/Fisio/TO) |
+| Módulo (Permiso de Edición) | Admin/Dirección | Medicina/Enfermería | Auxiliares | Técnicos (Social/Fisio/TO/Psi) |
 |--------|:---------------:|:-------------------:|:----------:|:--------------------------:|
 | **Registro de Constantes** | ✅ | ✅ | ❌ | ❌ |
 | **Registro de Cuidados** | ✅ | ✅ | ✅ | ❌ |
@@ -109,7 +111,7 @@ El acceso a las funcionalidades clínicas está estrictamente regulado según el
 | **Exportación PDF/Datos** | ✅ | ❌ | ❌ | ❌ |
 
 > [!NOTE]
-> Los auxiliares tienen permiso para registrar cuidados diarios, mientras que la toma de constantes está reservada a personal médico/enfermería. Los perfiles técnicos (Trabajo Social, Fisioterapia, Terapia Ocupacional) acceden a la visualización global pero solo pueden editar las secciones del formulario de valoración correspondientes a su especialidad.
+> Los auxiliares tienen permiso para registrar cuidados diarios, mientras que la toma de constantes está reservada a personal médico/enfermería. Los perfiles técnicos (Trabajo Social, Fisioterapia, Terapia Ocupacional, Psicología) acceden a la visualización global pero solo pueden editar las secciones del formulario de valoración correspondientes a su especialidad (ej: Psicología accede a P6: Cognitivo y P11: Valores y Creencias).
 
 ## 🛡️ Calidad de Código
 El proyecto utiliza **Ruff** para linting y **Pytest** para pruebas:

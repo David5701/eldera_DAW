@@ -1,11 +1,11 @@
 # Define available roles
-ROLES = ["admin", "director", "nurse", "doctor", "aux", "physiotherapist", "occupational_therapist", "social_worker"]
+ROLES = ["admin", "director", "nurse", "doctor", "aux", "physiotherapist", "occupational_therapist", "social_worker", "psychologist"]
 
 # Permission matrix: action -> list of roles allowed
 PERMISSIONS = {
     # Resident Management
     "create_resident": ["admin", "director", "nurse", "doctor"],
-    "edit_resident_basic": ["admin", "director", "nurse", "doctor", "aux", "physiotherapist", "occupational_therapist", "social_worker"],
+    "edit_resident_basic": ["admin", "director", "nurse", "doctor", "aux", "physiotherapist", "occupational_therapist", "social_worker", "psychologist"],
     "edit_resident_clinical": ["admin", "director", "nurse", "doctor"],
     "delete_resident": ["admin"],
 

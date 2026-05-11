@@ -17,8 +17,44 @@ def init_db():
             print("✅ Extensión unaccent habilitada.")
         except Exception as e:
             print(f"⚠️  No se pudo habilitar unaccent automáticamente: {e}")
-            print("   Esto es normal en algunos entornos gestionados. Asegúrese de habilitarla manualmente si es necesario.")
             db.rollback()
+
+        # 0.1 Sincronización de esquema (Asegurar columnas nuevas tras actualizaciones de modelos)
+        print("Verificando integridad del esquema de base de datos...")
+        from sqlalchemy import inspect
+        inspector = inspect(engine)
+        if "residents" in inspector.get_table_names():
+            columns = [col['name'] for col in inspector.get_columns('residents')]
+            
+            # Listado de columnas críticas añadidas recientemente
+            required_cols = [
+                ("surgical_history", "TEXT"),
+                ("other_diseases", "TEXT"),
+                ("diagnosis_hypertension_detail", "VARCHAR"),
+                ("diagnosis_cancer_type", "VARCHAR"),
+                ("requires_positioning", "BOOLEAN DEFAULT FALSE"),
+                ("positioning_frequency", "INTEGER"),
+                ("uses_anti_bedsore_mattress", "BOOLEAN DEFAULT FALSE"),
+                ("requires_diabetic_foot_care", "BOOLEAN DEFAULT FALSE"),
+                ("requires_special_oral_care", "BOOLEAN DEFAULT FALSE"),
+                ("additional_data", "JSON"),
+                ("family_contacts", "JSON"),
+                ("sleep_medication", "VARCHAR"),
+                ("sleep_pattern", "VARCHAR"),
+                ("sleep_observations", "TEXT")
+            ]
+            
+            for col_name, col_type in required_cols:
+                if col_name not in columns:
+                    print(f"   🔧 Añadiendo columna faltante: {col_name}...")
+                    try:
+                        # Usar JSON en lugar de JSONB para compatibilidad si no es Postgres
+                        db.execute(text(f"ALTER TABLE residents ADD COLUMN {col_name} {col_type}"))
+                        db.commit()
+                    except Exception as col_err:
+                        print(f"   ⚠️ Error al añadir {col_name}: {col_err}")
+                        db.rollback()
+        
 
         # 1. Asegurar que existe la Residencia 1 (DEPENDENCIA CRÍTICA)
         residence = db.query(models.Residence).filter(models.Residence.id == 1).first()
@@ -53,25 +89,16 @@ def init_db():
             db.add(admin_user)
             db.commit()
             print("✅ Usuario administrador creado con éxito.")
-        else:
-            # CORRECCIÓN DE MIGRACIÓN: Asegurar que el admin tiene hash bcrypt (empieza por $2b$)
-            # Esto soluciona fallos de login tras cambiar de passlib a bcrypt
-            if not user.hashed_password.startswith("$2b$"):
-                print("⚠️ Migrando contraseña de admin al formato bcrypt...")
-                user.hashed_password = auth.get_password_hash("admin123")
-                db.commit()
-                print("✅ Contraseña de admin migrada con éxito.")
-
-        # Crear usuarios de prueba para todos los roles
+        # Migración y creación de usuarios de prueba
         test_users_data = [
             ("admin", "admin123", "admin"),
-            ("director1", "director123", "director"),
             ("nurse1", "nurse123", "nurse"),
             ("aux1", "aux123", "aux"),
             ("doctor_test", "eldera2024", "doctor"),
             ("social_test", "eldera2024", "social_worker"),
             ("occupational_test", "eldera2024", "occupational_therapist"),
             ("physio_test", "eldera2024", "physiotherapist"),
+            ("psi1", "psi123", "psychologist"),
         ]
 
         for username, password, role in test_users_data:
@@ -91,8 +118,15 @@ def init_db():
                     is_active=True,
                 )
                 db.add(new_user)
+            else:
+                # MIGRACIÓN: Si el usuario existe pero no tiene hash bcrypt, lo actualizamos
+                if not existing_user.hashed_password.startswith("$2b$"):
+                    print(f"⚠️ Migrando contraseña de {username} ({role}) a bcrypt...")
+                    existing_user.hashed_password = auth.get_password_hash(password)
+                    existing_user.role = role # Asegurar que el rol es el correcto
+        
         db.commit()
-        print("✅ Usuarios de prueba creados con éxito")
+        print("✅ Usuarios de prueba sincronizados y migrados a bcrypt.")
 
         # SEMILLA DE RESIDENTES si está vacío — usar seed_test_data para la versión académica
         resident_count = db.query(models.Resident).count()
@@ -104,6 +138,15 @@ def init_db():
                 print("✅ seed_test_data completado.")
             except Exception as seed_err:
                 print(f"⚠️  seed_test_data falló (no crítico): {seed_err}")
+
+        # MIGRACIÓN: Asegurar que todos los residentes tienen una residencia asignada (ID=1 por defecto)
+        # Esto es crítico para que nuevos roles como psicólogo puedan ver los datos previos.
+        residents_without_residence = db.query(models.Resident).filter(models.Resident.residence_id == None).count()
+        if residents_without_residence > 0:
+            print(f"🔧 Migrando {residents_without_residence} residentes sin ID de residencia a ID=1...")
+            db.query(models.Resident).filter(models.Resident.residence_id == None).update({models.Resident.residence_id: 1})
+            db.commit()
+            print("✅ Residentes migrados correctamente.")
 
         # SANITIZACIÓN: Limpiar datos existentes para asegurar cumplimiento de esquema
         print("🧹 Ejecutando Sanitización de Datos (Contactos de Emergencia)...")

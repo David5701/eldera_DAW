@@ -28,8 +28,8 @@ export default function ResidentList({
     const [residenceName, setResidenceName] = useState('');
 
     const currentUserRole = (user?.role || '').toLowerCase().trim();
-    const canQuickRecord = ['admin', 'director', 'doctor', 'nurse', 'aux'].includes(currentUserRole);
-    const canEditGeneral = ['admin', 'director', 'doctor', 'nurse', 'aux'].includes(currentUserRole);
+    const canQuickRecord = ['admin', 'doctor', 'nurse', 'aux'].includes(currentUserRole);
+    const canEditGeneral = ['admin', 'doctor', 'nurse', 'aux', 'psychologist'].includes(currentUserRole);
 
 
     // Fetch residence name from dashboard stats
@@ -260,8 +260,8 @@ function ResidentTable({ residents, residenceName }) {
                 <p className="text-xs text-slate-400 mt-0.5">{residents.length} residentes</p>
             </div>
 
-            {/* Table Container with Rounded Borders */}
-            <div className="overflow-hidden border border-slate-200 rounded-2xl print:border print:border-slate-300 print:rounded-2xl">
+            {/* Table Container with Rounded Borders and Margins */}
+            <div className="mx-2 md:mx-6 mb-8 overflow-hidden print:overflow-visible border border-slate-200 rounded-3xl print:border print:border-slate-300 print:rounded-2xl shadow-sm">
                 {/* Desktop Table */}
                 <div className="hidden md:block print:block overflow-x-auto">
                     <table className="min-w-full divide-y divide-slate-200">

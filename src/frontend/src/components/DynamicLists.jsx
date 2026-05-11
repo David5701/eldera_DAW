@@ -117,81 +117,93 @@ export default function DynamicLists({ onBack }) {
     // --- VISTA DE DETALLE (TABLA) ---
     const [printBackground, setPrintBackground] = useState(false); // Default to clean/white for saving ink
 
-    // --- VISTA DE DETALLE (TABLA) ---
+    const printStyles = `
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            @page { 
+                margin: 0 !important; 
+                size: auto; 
+            }
+            
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: ${printBackground ? '#dbeafe' : 'white'} !important;
+            }
+
+            #root, #app-layout, main {
+                padding: 0 !important;
+                margin: 0 !important;
+                background-color: transparent !important;
+            }
+
+            .print-container {
+                display: block !important;
+                width: 100% !important;
+                padding: ${printBackground ? '15mm 0' : '0'} !important;
+                margin: 0 !important;
+                background-color: ${printBackground ? '#dbeafe' : 'transparent'} !important;
+                min-height: 100vh !important;
+            }
+
+            .print-card {
+                background-color: white !important;
+                padding: 25mm 20mm !important;
+                width: ${printBackground ? '190mm' : '100%'} !important;
+                margin: 0 auto !important;
+                border-radius: ${printBackground ? '3rem' : '0'} !important;
+                min-height: ${printBackground ? 'auto' : '297mm'} !important;
+                box-sizing: border-box !important;
+                display: block !important;
+                box-shadow: ${printBackground ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : 'none'} !important;
+                overflow: hidden !important;
+                position: relative !important;
+            }
+
+            table {
+                width: 100% !important;
+                border-collapse: separate !important;
+                border-spacing: 0 !important;
+                margin-top: 15mm !important;
+                table-layout: auto !important;
+            }
+
+            thead th {
+                background-color: #f8fafc !important;
+                color: #0f172a !important;
+                font-weight: 900 !important;
+                padding: 8mm 12mm !important;
+                text-align: left !important;
+                border-bottom: 4px solid #0f172a !important;
+                font-size: 12pt !important;
+                text-transform: uppercase !important;
+            }
+
+            td {
+                padding: 8mm 12mm !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+                color: #1e293b !important;
+                font-size: 11pt !important;
+                line-height: 1.6 !important;
+            }
+
+            .no-print { display: none !important; }
+        }
+    `;
+
     if (selectedList) {
         return (
-            <div className={`print-container flex flex-col gap-6 w-full h-full animate-in fade-in duration-300 pt-2 md:pt-0 print:pt-0 print:block print:gap-0 print:h-auto`}>
-                <style>{`
-                    @media print {
-                        * {
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                        }
-
-                        @page { 
-                            margin: 10mm !important; 
-                            size: auto; 
-                        }
-                        
-                        html, body, #root, #app-layout, .min-h-screen, main, main > div {
-                            background-color: ${printBackground ? '#dbeafe' : 'white'} !important;
-                            width: 100% !important;
-                            height: auto !important;
-                            margin: 0 !important;
-                            padding: 0 !important;
-                            display: block !important;
-                        }
-
-                        header, nav, aside, .no-print, [role="navigation"] { 
-                            display: none !important; 
-                        }
-
-                        .print-container {
-                            width: 100% !important;
-                            margin: 0 !important;
-                            padding: 0 !important;
-                        }
-
-                        .bg-white {
-                            background-color: white !important;
-                            border: none !important;
-                            border-radius: ${printBackground ? '2rem' : '0'} !important;
-                            box-shadow: ${printBackground ? '0 10px 20px -5px rgba(0,0,0,0.1)' : 'none'} !important;
-                            padding: 10mm !important;
-                            width: ${printBackground ? 'calc(100% - 20mm)' : '100%'} !important;
-                            margin: ${printBackground ? '10mm auto' : '0'} !important;
-                            min-height: ${printBackground ? '250mm' : 'auto'} !important;
-                        }
-
-                        table {
-                            width: 100% !important;
-                            border-collapse: collapse !important;
-                            margin-top: 5mm !important;
-                        }
-
-                        thead th {
-                            background-color: #f1f5f9 !important;
-                            color: #334155 !important;
-                            font-weight: bold !important;
-                            padding: 4mm 2mm !important;
-                            text-align: left !important;
-                            border-bottom: 2px solid #e2e8f0 !important;
-                        }
-
-                        td {
-                            padding: 3mm 2mm !important;
-                            border-bottom: 1px solid #f1f5f9 !important;
-                            color: #475569 !important;
-                        }
-
-                        .print\\:hidden { display: none !important; }
-                    }
-                `}</style>
+            <div className="print-container flex flex-col gap-6 w-full h-full animate-in fade-in duration-300 pt-2 md:pt-0 print:pt-0 print:block print:gap-0 print:h-auto print:w-full">
+                <style>{printStyles}</style>
 
                 {/* Print Options Control moved to Card Header */}
 
                 {/* Card Container */}
-                <div className="bg-white rounded-[2.5rem] p-4 md:p-8 shadow-sm min-h-[500px] print:rounded-[2rem] print:border print:border-slate-200 print:p-10 print:w-full print:min-h-0 print:shadow-none">
+                <div className="bg-white print-card rounded-[2.5rem] p-4 md:p-8 shadow-sm min-h-[500px] print:rounded-[2rem] print:w-full print:min-h-0 print:shadow-none">
 
                     {/* A) HEADER PARA IMPRESIÓN (DISEÑO PREMIUM) */}
                     <div className="hidden print:flex flex-col gap-6 mb-8">
@@ -265,24 +277,24 @@ export default function DynamicLists({ onBack }) {
                     </div>
 
                     {/* CONTENEDOR DE TABLA */}
-                    <div className="overflow-x-auto rounded-3xl border border-slate-200 overflow-hidden print:w-full print:border-none print:rounded-none">
+                    <div className="overflow-x-auto rounded-3xl border border-slate-200 overflow-hidden print:overflow-visible print:w-full print:border-none print:rounded-none">
                         <table className="min-w-full divide-y divide-slate-200 hidden md:table border-collapse print:table print:w-full print:divide-y-0">
                             <thead className="bg-slate-50 print:bg-transparent">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider print:bg-slate-100 print:rounded-l-xl print:text-slate-700 print:py-3">Hab.</th>
-                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider print:bg-slate-100 print:text-slate-700 print:py-3">Residente</th>
-                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider print:bg-slate-100 print:rounded-r-xl print:text-slate-700 print:py-3">Detalles</th>
+                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">Hab.</th>
+                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">Residente</th>
+                                    <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">Detalles</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-slate-200 print:divide-slate-200">
                                 {selectedList.residents.map((r) => (
                                     <tr key={r.id} className="hover:bg-slate-50 transition-colors print:break-inside-avoid">
-                                        <td className="px-6 py-5 whitespace-nowrap text-xs md:text-sm font-bold text-slate-900 print:px-3 print:py-4 print:text-[11px]">{r.room_number}</td>
-                                        <td className="px-6 py-5 whitespace-nowrap text-xs md:text-sm font-medium text-slate-900 print:px-3 print:py-4 print:text-[11px]">{r.surname}, {r.name}</td>
-                                        <td className="px-6 py-5 text-sm text-slate-600 print:px-3 print:py-4 print:text-[11px]">
+                                        <td className="px-6 py-5 whitespace-nowrap text-xs md:text-sm font-bold text-slate-900">{r.room_number}</td>
+                                        <td className="px-6 py-5 whitespace-nowrap text-xs md:text-sm font-medium text-slate-900">{r.surname}, {r.name}</td>
+                                        <td className="px-6 py-5 text-sm text-slate-600">
                                             <div className="flex flex-wrap gap-2 print:gap-1.5">
                                                 {Object.entries(r.relevant_data).map(([key, value]) => (
-                                                    <span key={key} className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200 print:bg-transparent print:border-none print:text-black print:px-0 print:py-0 print:rounded-none">
+                                                    <span key={key} className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200 print:bg-transparent print:border-none print:text-black print:px-1 print:py-0 print:rounded-none">
                                                         <span className='font-bold mr-1.5 uppercase text-[10px] text-slate-500 print:text-slate-400 print:text-[9px]'>{key}:</span>
                                                         {value != null ? value.toString() : '--'}
                                                     </span>
@@ -329,7 +341,7 @@ export default function DynamicLists({ onBack }) {
     return (
         <div className="space-y-6 pt-2 md:pt-0 pb-20">
             {/* Card Container for Grid */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200 p-10 shadow-sm">
+            <div className="bg-white rounded-[2.5rem] border border-slate-200 p-4 md:p-10 shadow-sm">
 
                 {/* Header (Back, Title & Search) INSIDE Card */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">

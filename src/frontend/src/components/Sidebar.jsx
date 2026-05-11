@@ -35,7 +35,7 @@ export default function Sidebar({ isOpen, onClose }) {
     };
 
     const currentUserRole = (user?.role || '').toLowerCase().trim();
-    const canAddResident = ['admin', 'director', 'nurse', 'doctor'].includes(currentUserRole);
+    const canAddResident = ['admin', 'nurse', 'doctor'].includes(currentUserRole);
 
     const navigation = [
         { name: 'Panel de Control', href: '/', icon: LayoutDashboard },

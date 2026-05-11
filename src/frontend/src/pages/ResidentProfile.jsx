@@ -97,7 +97,36 @@ const TRANSLATIONS = {
     'elastic': 'Elástico',
     'pant': 'Bragapañal',
     
+    // Deterioro y Escalas
+    'none': 'Sin deterioro',
+    'mild': 'Leve',
+    'moderate': 'Moderado',
+    'severe': 'Grave',
+    'specialist': 'Especialista',
+    'urgency': 'Urgencias',
+
+    // Booleans y Genéricos
+    'true': 'Sí',
+    'false': 'No',
+    'yes': 'Sí',
+    'no': 'No',
+    
     // Sujeciones
+    'bed_rails': 'Barandillas',
+    'waist_belt': 'Cinturón abdominal',
+    'chest_vest': 'Chaleco torácico',
+    'pelvic_strap': 'Cincha pélvica',
+    'mittens': 'Manoplas',
+    
+    // Roles de Usuario
+    'admin': 'Administrador / Dirección',
+    'doctor': 'Médico',
+    'nurse': 'Enfermería',
+    'physiotherapist': 'Fisioterapia',
+    'occupational_therapist': 'Terapia Ocupacional',
+    'social_worker': 'Trabajo Social',
+    'psychologist': 'Psicólogo',
+    'nursing_assistant': 'Auxiliar / Gerocultor',
     'abdominal': 'Cinturón Abdominal',
     'pelvic': 'Cinturón Pélvico',
     'muñequeras': 'Muñequeras',
@@ -145,7 +174,7 @@ const EDIT_TAB_MAP = {
 const canEditSection = (sectionId, userRole) => {
     if (!userRole) return false;
     const role = userRole.toLowerCase().trim();
-    if (['admin', 'director', 'doctor', 'nurse'].includes(role)) return true;
+    if (['admin', 'doctor', 'nurse'].includes(role)) return true;
     
     // Aux can edit basic identification and some functional patterns
     if (role === 'aux') {
@@ -153,9 +182,12 @@ const canEditSection = (sectionId, userRole) => {
         return auxAllowed.includes(sectionId);
     }
     
-    // Technical roles (Social/Physio/Occupational) can only edit their specific sections
+    // Technical roles (Social/Physio/Occupational/Psychologist) can only edit their specific sections
     if (role === 'social_worker') {
         return ['self_perception', 'social', 'values'].includes(sectionId);
+    }
+    if (role === 'psicologo' || role === 'psychologist') {
+        return ['cognitive', 'self_perception'].includes(sectionId);
     }
     if (role === 'physiotherapist' && sectionId === 'mobility') return true;
     if (role === 'occupational_therapist' && sectionId === 'cognitive') return true;
@@ -644,28 +676,67 @@ function MedicalDetail({ resident }) {
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-slate-200">
-                    <h3 className="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
-                        <History className="w-5 h-5 text-indigo-500" /> Antecedentes Quirúrgicos
-                    </h3>
-                    {Array.isArray(resident.medical_history) && resident.medical_history.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                            {resident.medical_history.map((item, idx) => (
-                                <div key={item.id || idx} className={`
-                                    flex items-center gap-2 px-3 py-1.5 rounded-full text-sm border
-                                    ${item.type === 'surgery' ? 'bg-purple-50 border-purple-200 text-purple-700' : 'bg-blue-50 border-blue-200 text-blue-700'}
-                                `}>
-                                    <span className="font-black text-[10px] uppercase px-1.5 py-0.5 rounded-md bg-white/50">
-                                        {item.type === 'surgery' ? 'CIR' : 'ENF'}
-                                    </span>
-                                    <span className="font-bold">{item.name}</span>
-                                    {item.year && <span className="opacity-75 text-xs">({item.year})</span>}
+                {/* Clinical History Sections */}
+                <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-8">
+                    {/* Section: Pathologies */}
+                    <div>
+                        <h3 className="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
+                            <History className="w-5 h-5 text-indigo-500" /> Otras Patologías
+                        </h3>
+                        <div className="space-y-3">
+                            {resident.other_diseases && (
+                                <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 whitespace-pre-wrap">
+                                    {resident.other_diseases}
+                                </p>
+                            )}
+                            
+                            {/* Legacy Diseases */}
+                            {Array.isArray(resident.medical_history) && resident.medical_history.filter(m => m.type !== 'surgery').length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                    {resident.medical_history.filter(m => m.type !== 'surgery').map((item, idx) => (
+                                        <div key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] border bg-blue-50 border-blue-200 text-blue-700">
+                                            <span className="font-bold">{item.name}</span>
+                                            {item.year && <span className="opacity-75 text-[10px]">({item.year})</span>}
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            )}
+                            
+                            {!resident.other_diseases && (!Array.isArray(resident.medical_history) || resident.medical_history.filter(m => m.type !== 'surgery').length === 0) && (
+                                <p className="text-slate-400 text-sm italic">Sin patologías adicionales registradas.</p>
+                            )}
                         </div>
-                    ) : (
-                        <p className="text-slate-400 text-sm italic py-4 text-center">No hay antecedentes registrados.</p>
-                    )}
+                    </div>
+
+                    {/* Section: Surgeries */}
+                    <div>
+                        <h3 className="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
+                            <History className="w-5 h-5 text-purple-500" /> Antecedentes Quirúrgicos
+                        </h3>
+                        <div className="space-y-3">
+                            {resident.surgical_history && (
+                                <p className="text-sm text-slate-700 bg-purple-50 p-3 rounded-xl border border-purple-100 whitespace-pre-wrap">
+                                    {resident.surgical_history}
+                                </p>
+                            )}
+                            
+                            {/* Legacy Surgeries */}
+                            {Array.isArray(resident.medical_history) && resident.medical_history.filter(m => m.type === 'surgery').length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                    {resident.medical_history.filter(m => m.type === 'surgery').map((item, idx) => (
+                                        <div key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] border bg-purple-50 border-purple-200 text-purple-700">
+                                            <span className="font-bold">{item.name}</span>
+                                            {item.year && <span className="opacity-75 text-[10px]">({item.year})</span>}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {!resident.surgical_history && (!Array.isArray(resident.medical_history) || resident.medical_history.filter(m => m.type === 'surgery').length === 0) && (
+                                <p className="text-slate-400 text-sm italic">Sin intervenciones quirúrgicas registradas.</p>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -732,6 +803,7 @@ function MedicalDetail({ resident }) {
                     </div>
                 </div>
             </div>
+
 
         </div>
     );
@@ -855,24 +927,11 @@ function SelfPerceptionDetail({ resident }) {
             <div className="space-y-6">
                 {resident.emotional_state && (
                     <div>
-                        <h4 className="font-bold text-pink-800 text-sm mb-2 uppercase tracking-wider">Estado Emocional Habitual</h4>
-                        <p className="text-slate-700 bg-white/50 p-4 rounded-xl border border-pink-100 leading-relaxed italic">
-                            "{resident.emotional_state}"
+                        <h4 className="font-bold text-pink-800 text-sm mb-2 uppercase tracking-wider">Estado Emocional</h4>
+                        <p className="text-slate-600 leading-relaxed bg-white/50 p-4 rounded-xl border border-pink-100">
+                            {resident.emotional_state || 'No se ha registrado el estado emocional.'}
                         </p>
                     </div>
-                )}
-
-                {resident.first_impressions && (
-                    <div>
-                        <h4 className="font-bold text-pink-800 text-sm mb-2 uppercase tracking-wider">Primeras Impresiones (Ingreso)</h4>
-                        <p className="text-slate-700 bg-white/50 p-4 rounded-xl border border-pink-100 leading-relaxed whitespace-pre-wrap">
-                            {resident.first_impressions}
-                        </p>
-                    </div>
-                )}
-
-                {!resident.emotional_state && !resident.first_impressions && (
-                    <p className="text-slate-500 italic">No hay información registrada sobre autopercepción.</p>
                 )}
             </div>
         </div>
@@ -935,31 +994,40 @@ function StressDetail({ resident }) {
 
 function ValuesDetail({ resident }) {
     return (
-    <div className="space-y-8 relative">
+    <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                <h4 className="font-black text-slate-900 mb-4 uppercase tracking-widest text-xs flex items-center gap-2">
+                    <FileCheck className="w-4 h-4 text-slate-500" /> Plan de Cuidados
+                </h4>
+                {resident.care_plan ? (
+                    <p className="text-slate-700 whitespace-pre-wrap bg-white p-4 rounded-xl border border-slate-100 leading-relaxed italic text-sm">
+                        {resident.care_plan}
+                    </p>
+                ) : (
+                    <p className="text-slate-400 italic text-sm">No hay un plan de cuidados registrado.</p>
+                )}
+            </div>
 
-
-
-
-        <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-            <h4 className="font-bold text-slate-900 mb-4">Plan de Cuidados General</h4>
-            {resident.care_plan ? (
-                <p className="text-slate-700 whitespace-pre-wrap bg-white p-4 rounded-xl border border-slate-100 leading-relaxed italic">
-                    {resident.care_plan}
-                </p>
-            ) : (
-                <p className="text-slate-400 italic text-sm">No hay un plan de cuidados general registrado.</p>
-            )}
+            <div className="bg-teal-50 p-6 rounded-2xl border border-teal-100">
+                <h4 className="font-black text-teal-900 mb-4 uppercase tracking-widest text-xs flex items-center gap-2">
+                    <Stethoscope className="w-4 h-4 text-teal-500" /> Observaciones
+                </h4>
+                {resident.first_impressions ? (
+                    <p className="text-slate-700 whitespace-pre-wrap bg-white p-4 rounded-xl border border-teal-100 leading-relaxed text-sm">
+                        {resident.first_impressions}
+                    </p>
+                ) : (
+                    <p className="text-slate-400 italic text-sm">Sin observaciones registradas.</p>
+                )}
+            </div>
         </div>
 
-        <div className="bg-teal-50 p-6 rounded-2xl border border-teal-100">
-            <h4 className="font-bold text-teal-900 mb-4">Observaciones</h4>
-            {resident.first_impressions ? (
-                <p className="text-slate-700 whitespace-pre-wrap bg-white p-4 rounded-xl border border-teal-100 leading-relaxed">
-                    {resident.first_impressions}
-                </p>
-            ) : (
-                <p className="text-slate-400 italic text-sm">Sin observaciones registradas.</p>
-            )}
+        <div className="bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-100 mt-4">
+            <h4 className="font-bold text-slate-400 text-[10px] uppercase tracking-widest mb-2 flex items-center gap-2">
+                <Smile className="w-3 h-3" /> Valores y Creencias
+            </h4>
+            <p className="text-slate-500 text-sm italic">Este apartado permite valorar la esfera espiritual y ética del residente.</p>
         </div>
     </div>
     );
@@ -1146,10 +1214,7 @@ function SocialDetail({ resident }) {
                     <p className="text-slate-600 text-sm leading-relaxed">{resident.family_situation || 'No hay descripción de la situación familiar.'}</p>
                 </div>
 
-                <div className="bg-white p-4 rounded-xl border border-slate-200">
-                    <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Apoyo Social / Amistades</p>
-                    <p className="text-sm text-slate-700">{resident.social_support_network || 'No registrado'}</p>
-                </div>
+                {/* Eliminado 'social_support_network' por no registrarse en formulario */}
 
                 {(resident.family_contacts && resident.family_contacts.length > 0) ? (
                     <div className="space-y-3">
@@ -1267,18 +1332,18 @@ function NutritionDetail({ resident }) {
                     <h3 className="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
                         <Scale className="w-5 h-5 text-emerald-500" /> Antropometría y Salud Bucal
                     </h3>
-                    <div className="grid grid-cols-3 gap-4 text-center mb-6">
-                        <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-200">
-                            <p className="text-xs text-slate-500 uppercase font-bold">Peso</p>
-                            <p className="text-xl font-black text-slate-800">{resident.weight || '--'} <span className="text-xs font-normal">kg</span></p>
+                    <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center mb-6">
+                        <div className="p-2 md:p-3 bg-white rounded-xl shadow-sm border border-slate-200">
+                            <p className="text-[9px] md:text-xs text-slate-500 uppercase font-bold">Peso</p>
+                            <p className="text-sm md:text-xl font-black text-slate-800">{resident.weight || '--'} <span className="text-[10px] md:text-xs font-normal">kg</span></p>
                         </div>
-                        <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-200">
-                            <p className="text-xs text-slate-500 uppercase font-bold">Talla</p>
-                            <p className="text-xl font-black text-slate-800">{resident.height || '--'} <span className="text-xs font-normal">cm</span></p>
+                        <div className="p-2 md:p-3 bg-white rounded-xl shadow-sm border border-slate-200">
+                            <p className="text-[9px] md:text-xs text-slate-500 uppercase font-bold">Talla</p>
+                            <p className="text-sm md:text-xl font-black text-slate-800">{resident.height || '--'} <span className="text-[10px] md:text-xs font-normal">cm</span></p>
                         </div>
-                        <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-200">
-                            <p className="text-xs text-slate-500 uppercase font-bold">IMC</p>
-                            <p className="text-xl font-black text-slate-800">
+                        <div className="p-2 md:p-3 bg-white rounded-xl shadow-sm border border-slate-200">
+                            <p className="text-[9px] md:text-xs text-slate-500 uppercase font-bold">IMC</p>
+                            <p className="text-sm md:text-xl font-black text-slate-800">
                                 {resident.bmi ? parseFloat(resident.bmi).toFixed(1) : 
                                  (resident.weight && resident.height) ? 
                                  (resident.weight / ((resident.height/100) * (resident.height/100))).toFixed(1) : '--'}
@@ -1531,8 +1596,12 @@ function ResidentProfile() {
     const fetchVitals = useCallback(async (silent = false) => {
         if (!silent) setVitalsLoading(true);
         try {
-            const res = await api.get(`/residents/${id}/vitals${silent ? '?silent=true' : ''}`);
-            const latestV = {};
+            const params = new URLSearchParams();
+            if (silent) params.append('silent', 'true');
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+            
+            const res = await api.get(`/residents/${id}/vitals?${params.toString()}`);
             const groupedV = {};
             res.data.forEach(v => {
                 if (!groupedV[v.vital_type]) groupedV[v.vital_type] = [];
@@ -1548,12 +1617,17 @@ function ResidentProfile() {
         } finally {
             setVitalsLoading(false);
         }
-    }, [id]);
+    }, [id, startDate, endDate]);
 
     const fetchCareLogs = useCallback(async (silent = false) => {
         if (!silent) setCareLoading(true);
         try {
-            const res = await api.get(`/residents/${id}/care-logs${silent ? '?silent=true' : ''}`);
+            const params = new URLSearchParams();
+            if (silent) params.append('silent', 'true');
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+
+            const res = await api.get(`/residents/${id}/care-logs?${params.toString()}`);
             const groupedC = {};
             res.data.forEach(log => {
                 if (!groupedC[log.care_type]) groupedC[log.care_type] = [];
@@ -1569,7 +1643,7 @@ function ResidentProfile() {
         } finally {
             setCareLoading(false);
         }
-    }, [id]);
+    }, [id, startDate, endDate]);
 
     // Initial load - Deduplicated and Rigid
     useEffect(() => {
@@ -1590,7 +1664,7 @@ function ResidentProfile() {
         } else if (activeSection === 'care') {
             fetchCareLogs();
         }
-    }, [id, activeSection, fetchVitals, fetchCareLogs]);
+    }, [id, activeSection, fetchVitals, fetchCareLogs, startDate, endDate]);
 
     const fetchAllData = useCallback(async (silent = false) => {
         // Wrapper for compatibility with refresh buttons
@@ -1803,6 +1877,25 @@ function ResidentProfile() {
                                         </Link>
                                     )}
                                 </div>
+
+                                {/* Mobile Date Filter (Visible only on small screens for Health/Care) */}
+                                {(activeSection === 'health' || activeSection === 'care') && (
+                                    <div className="lg:hidden px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
+                                        <DateRangeFilter
+                                            startDate={startDate}
+                                            endDate={endDate}
+                                            onStartChange={setStartDate}
+                                            onEndChange={setEndDate}
+                                        />
+                                        <button
+                                            onClick={fetchAllData}
+                                            className="h-10 w-10 shrink-0 flex items-center justify-center bg-[#0F172A] text-white rounded-xl shadow-sm active:scale-95 transition-all"
+                                            title="Actualizar datos"
+                                        >
+                                            <RefreshCw className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
 
                                 {/* Section Content Area */}
                                 <div className="p-4 md:p-12">

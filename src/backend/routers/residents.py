@@ -468,7 +468,7 @@ def get_dynamic_lists(
         residents = (
             db.query(models.Resident)
             .filter(
-                models.Resident.requires_positioning.is_(True),
+                (models.Resident.requires_positioning.is_(True)) | (models.Resident.mobility_level == "bedridden"),
                 models.Resident.residence_id == current_user.residence_id,
             )
             .all()
@@ -644,6 +644,7 @@ def get_dynamic_lists(
         def translate_diaper_type(val):
             _tipos = {
                 "anatomy": "Anatómico",
+                "anatomical": "Anatómico",
                 "pant": "Bragapañal",
                 "elastic": "Elástico",
             }
@@ -1363,6 +1364,8 @@ def create_vital_signs_batch(
 def get_resident_vitals(
     resident_id: int,
     silent: Optional[bool] = Query(False, description="Skip audit log"),
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(auth.get_current_active_user),
     request: Request = None,
@@ -1372,17 +1375,23 @@ def get_resident_vitals(
         raise HTTPException(status_code=403, detail="Permiso denegado")
 
     try:
-        vitals = (
-            db.query(models_extended.ResidentVitalSign)
-            .filter(
-                models_extended.ResidentVitalSign.resident_id == resident_id,
-                models_extended.ResidentVitalSign.residence_id == current_user.residence_id,
-            )
-            .order_by(models_extended.ResidentVitalSign.measured_at.desc())
-            .limit(100)
-            .all()
+        query = db.query(models_extended.ResidentVitalSign).filter(
+            models_extended.ResidentVitalSign.resident_id == resident_id,
+            models_extended.ResidentVitalSign.residence_id == current_user.residence_id,
         )
 
+        if start_date:
+            query = query.filter(
+                models_extended.ResidentVitalSign.measured_at
+                >= datetime.combine(start_date, datetime.min.time())
+            )
+        if end_date:
+            query = query.filter(
+                models_extended.ResidentVitalSign.measured_at
+                <= datetime.combine(end_date, datetime.max.time())
+            )
+
+        vitals = query.order_by(models_extended.ResidentVitalSign.measured_at.desc()).all()
         return vitals
     except Exception as e:
         print(f"ERROR EN GET_RESIDENT_VITALS: {str(e)}")
@@ -1429,6 +1438,8 @@ def create_care_log(
 def get_resident_care_logs(
     resident_id: int,
     silent: Optional[bool] = Query(False, description="Skip audit log"),
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(auth.get_current_active_user),
     request: Request = None,
@@ -1438,17 +1449,23 @@ def get_resident_care_logs(
         raise HTTPException(status_code=403, detail="Permiso denegado")
 
     try:
-        care_logs = (
-            db.query(models_extended.ResidentCareLog)
-            .filter(
-                models_extended.ResidentCareLog.resident_id == resident_id,
-                models_extended.ResidentCareLog.residence_id
-                == current_user.residence_id,
-            )
-            .order_by(models_extended.ResidentCareLog.logged_at.desc())
-            .all()
+        query = db.query(models_extended.ResidentCareLog).filter(
+            models_extended.ResidentCareLog.resident_id == resident_id,
+            models_extended.ResidentCareLog.residence_id == current_user.residence_id,
         )
 
+        if start_date:
+            query = query.filter(
+                models_extended.ResidentCareLog.logged_at
+                >= datetime.combine(start_date, datetime.min.time())
+            )
+        if end_date:
+            query = query.filter(
+                models_extended.ResidentCareLog.logged_at
+                <= datetime.combine(end_date, datetime.max.time())
+            )
+
+        care_logs = query.order_by(models_extended.ResidentCareLog.logged_at.desc()).all()
         return care_logs
     except Exception as e:
         print(f"ERROR EN GET_RESIDENT_CARE_LOGS: {str(e)}")

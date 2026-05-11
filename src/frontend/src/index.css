@@ -56,9 +56,8 @@
 
 @media print {
   :root {
-    /* Default to WHITE for printing (Ink Saving) */
-    /* This will be overridden by DynamicLists if PDF mode is active */
-    --app-bg: #ffffff;
+    /* Restore Eldera Blue for printing as requested by user */
+    --app-bg: #dbeafe;
     background-color: var(--app-bg) !important;
   }
 
