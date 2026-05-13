@@ -92,10 +92,10 @@ const FIELD_TAB_MAP = {
     0: ['name', 'surname', 'dni_nie', 'document_type', 'date_of_birth', 'sex', 'room_number', 'admission_date', 'status', 'emergency_contact', 'nationality', 'phone', 'email', 'address'],
     1: ['diagnosis_diabetes', 'diagnosis_diabetes_type', 'diagnosis_cancer', 'diagnosis_cancer_type', 'has_medication_allergy', 'allergy_medication_detail', 'has_food_allergy', 'allergy_food_detail', 'has_food_intolerance', 'intolerance_food_detail', 'has_material_allergy', 'allergy_material_detail', 'no_known_allergies', 'primary_doctor', 'health_center'],
     2: ['diet_type', 'dysphagia', 'dysphagia_grade', 'diet_texture', 'thickener_instructions', 'weight', 'height', 'bmi', 'supplementation_formula'],
-    3: ['urinary_incontinence', 'urinary_incontinence_frequency', 'incontinence_type', 'fecal_incontinence', 'diaper_use', 'diaper_type', 'diaper_size', 'diaper_changes_per_day', 'bath_autonomy', 'bath_frequency'],
-    4: ['mobility_level', 'device_dentures', 'device_hearing_aids', 'device_glasses', 'device_oxygen', 'device_oxygen_type', 'device_oxygen_flow', 'device_oxygen_hours'],
+    3: ['urinary_incontinence', 'urinary_incontinence_frequency', 'incontinence_type', 'fecal_incontinence', 'fecal_incontinence_notes', 'diaper_use', 'diaper_type', 'diaper_size', 'diaper_changes_per_day', 'bath_autonomy', 'bath_frequency'],
+    4: ['mobility_level', 'device_dentures', 'device_hearing_aids', 'device_hearing_aids_side', 'device_hearing_aids_brand', 'device_glasses', 'device_oxygen', 'device_oxygen_type', 'device_oxygen_flow', 'device_oxygen_hours', 'device_nasogastric', 'device_nasogastric_type', 'device_nasogastric_date', 'device_veis', 'device_veis_type', 'device_veis_date', 'device_catheter', 'device_catheter_type', 'device_catheter_date', 'device_peg', 'device_peg_type', 'device_peg_date', 'device_tracheostomy', 'device_tracheostomy_type', 'device_tracheostomy_date'],
     5: ['sleep_pattern', 'sleep_medication'],
-    6: ['cognitive_impairment', 'mmse_score', 'pfeiffer_score', 'behavior_agitation', 'behavior_night_wandering', 'behavior_aggression', 'behavior_disorientation', 'uses_psychotropics'],
+    6: ['cognitive_impairment', 'mmse_score', 'pfeiffer_score', 'behavior_agitation', 'behavior_agitation_frequency', 'behavior_night_wandering', 'behavior_aggression', 'behavior_aggression_type', 'behavior_disorientation', 'behavior_disorientation_type', 'uses_psychotropics'],
     7: ['emotional_state'],
     8: ['family_situation'],
     9: ['sexuality_observations'],
@@ -131,11 +131,6 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
 
         const allowedRoles = SECTION_PERMISSIONS[sectionId] || [];
         const hasAccess = allowedRoles.includes(currentUserRole);
-
-        // DEBUG LOG: Útil para identificar por qué una sección está bloqueada
-        if (!hasAccess && !authLoading) {
-            console.warn(`Access Denied to Section ${sectionId} for role: ${currentUserRole}`);
-        }
 
         return hasAccess;
     };
@@ -213,7 +208,7 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
         hospitalization_end_date: '',
         hospitalization_hospital: '',
         hospitalization_reason: '',
-        hospitalization_history: [], // For display mainly, but good to have in state
+        hospitalization_history: [], // Solo para visualización, pero útil tenerlo en el estado
 
         // === DATOS MÉDICOS ===
         primary_doctor: '',
@@ -250,8 +245,13 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
 
         // === ALERGIAS ===
         has_medication_allergy: false,
+        allergy_medication_detail: '',
         has_food_allergy: false,
+        allergy_food_detail: '',
+        has_food_intolerance: false,
+        intolerance_food_detail: '',
         has_material_allergy: false,
+        allergy_material_detail: '',
         allergy_type: '',
         no_known_allergies: false,
         sexuality_observations: '',
@@ -276,10 +276,20 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
         device_oxygen_flow: '',
         device_oxygen_hours: '',
         device_nasogastric: false,
+        device_nasogastric_type: '',
+        device_nasogastric_date: '',
         device_veis: false,
+        device_veis_type: '',
+        device_veis_date: '',
         device_catheter: false,
+        device_catheter_type: '',
+        device_catheter_date: '',
         device_peg: false,
+        device_peg_type: '',
+        device_peg_date: '',
         device_tracheostomy: false,
+        device_tracheostomy_type: '',
+        device_tracheostomy_date: '',
         device_invasive_type: '',
         device_invasive_change_date: '',
 
@@ -299,12 +309,19 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
         bmi: '',
         supplementation_type: '',
         supplementation_formula: '',
+        supplement_diabetes: false,
+        supplement_fiber: false,
+        supplement_hchp: false,
+        supplement_renal: false,
+        diet_texture: '',
+        diet_texture_group: '',
+        thickener_instructions: '',
 
         // === HIGIENE Y CONTINENCIA ===
         urinary_incontinence: false,
         urinary_incontinence_frequency: '',
         fecal_incontinence: false,
-        fecal_incontinence_frequency: '',
+        fecal_incontinence_notes: '',
         incontinence_type: '',
         night_incontinence: false,
         diaper_use: false,
@@ -332,6 +349,11 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
         sleep_medication: '',
         sleep_pattern: '',
         sleep_observations: '',
+        
+        // === TOLERANCIA AL ESTRÉS (Sujeciones) ===
+        requires_restraint: false,
+        restraint_type: '',
+        restraint_schedule: '',
 
         // === VACUNACIÓN ===
         vaccine_flu_last: '',
@@ -386,8 +408,8 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
     const validateField = (name, value, contextData = null) => {
         const dataToValidate = contextData || { ...formData, [name]: value };
 
-        // Use safeParse on the full schema to handle dependencies (like document_type + dni_nie)
-        // We only care about the error for the specific field we are validating.
+        // Solo nos interesan los errores del campo específico que estamos validando.
+        // Usamos safeParse sobre el esquema completo para gestionar dependencias (ej. document_type + dni_nie)
         const result = residentSchema.safeParse(dataToValidate);
 
         if (!result.success) {
@@ -406,7 +428,7 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                 return true;
             }
         } else {
-            // Success generally (or at least for this field)
+            // Validación correcta (o al menos correcta para este campo)
             setErrors(prev => {
                 const newErrors = { ...prev };
                 delete newErrors[name];
@@ -428,38 +450,38 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
         }
     }, [formData.health_center_type]);
 
-    // Populate form when editing
+    // Rellenar el formulario al editar
 
 
     useEffect(() => {
         if (initialData) {
-            // Sanitize initialData to ensure no null values break controlled components
-            // Y convertir tipo de documento legado 'DNI_NIE' a 'DNI'
-            const sanitizedData = { ...initialData };
-
-
+            // Asegurar que todos los campos tienen valores por defecto seguros según su tipo
+            // Empezamos con el estado inicial para tener todas las claves presentes
+            const sanitizedData = { ...formData };
 
             // Helper para obtener valor seguro o defecto
             const safeVal = (val, defaultVal) => val === null || val === undefined ? defaultVal : val;
 
-            // Asegurar que todos los campos tienen valores por defecto seguros según su tipo
             Object.keys(initialData).forEach(key => {
-                // If it's a boolean field in default state, ensure it stays boolean
+                // Solo procesamos si el campo existe en nuestro estado o es una excepción conocida
+                if (!sanitizedData.hasOwnProperty(key) && key !== 'profile_photo') return;
+
+                // Si es un campo booleano en el estado inicial, asegurarse de que sigue siendo booleano
                 if (typeof formData[key] === 'boolean') {
                     const val = initialData[key];
-                    // Handle strings "true"/"false" from API if any, or null/undefined
+                    // Gestionar strings "true"/"false" de la API (si los hay) o null/undefined
                     if (val === 'true' || val === true) sanitizedData[key] = true;
                     else if (val === 'false' || val === false) sanitizedData[key] = false;
                     else sanitizedData[key] = false;
                 }
-                // If it's a string/number field, ensure it doesn't become null
+                // Si es un campo de texto/número, asegurarse de que no se convierte en null
                 else {
                     sanitizedData[key] = safeVal(initialData[key], '');
                 }
             });
 
-            // Convert legacy document_type 'DNI_NIE' to 'DNI'
-            // OR if it's empty/null set to 'DNI' (which matches the select visually)
+            // Convertir document_type heredado 'DNI_NIE' a 'DNI'
+            // O si está vacío/nulo, establecer 'DNI' (coincide con el select visualmente)
             if (sanitizedData.document_type === 'DNI_NIE' || !sanitizedData.document_type) {
                 sanitizedData.document_type = 'DNI';
             }
@@ -553,17 +575,18 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
         const newData = { ...formData, [name]: newValue };
 
         // Real-time validation
-        // Always validate the field being changed to give immediate feedback if it's now invalid or valid
+        // Validar siempre el campo que se está modificando para dar retroalimentación inmediata
         validateField(name, newValue, newData);
 
-        // --- DEPENDENCY VALIDATION ---
-        // When a parent checkbox changes, re-validate its child field immediately
+        // --- VALIDACIÓN DE DEPENDENCIAS ---
+        // Cuando cambia un checkbox padre, re-validar su campo hijo inmediatamente
         const dependencies = {
             'diagnosis_diabetes': ['diagnosis_diabetes_type'],
             'diagnosis_cancer': ['diagnosis_cancer_type'],
-            'has_medication_allergy': ['allergy_type'],
-            'has_food_allergy': ['allergy_type'],
-            'has_material_allergy': ['allergy_type'],
+            'has_medication_allergy': ['allergy_medication_detail'],
+            'has_food_allergy': ['allergy_food_detail'],
+            'has_food_intolerance': ['intolerance_food_detail'],
+            'has_material_allergy': ['allergy_material_detail'],
             // New dependencies
             'dysphagia': ['diet_texture', 'dysphagia_grade'],
             'diaper_use': ['diaper_type', 'diaper_size'],
@@ -579,20 +602,20 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
             });
         }
 
-        // Check internal dependencies like DNI type
+        // Comprobar dependencias internas como el tipo de documento DNI
         if (name === 'document_type') {
             validateField('dni_nie', formData.dni_nie, newData);
         }
     };
 
-    // Add onBlur handler to trigger validation when leaving a field
+    // Manejador onBlur para activar la validación al salir de un campo
     const handleBlur = (e) => {
         const { name, value, type, checked } = e.target;
         const val = type === 'checkbox' ? checked : value;
 
         // Special DNI Immediate Validation
         if (name === 'dni_nie') {
-            // Force re-validation of this specific field with explicit visual feedback
+            // Forzar re-validación del campo con retroalimentación visual explícita
             validateField(name, val);
         } else {
             validateField(name, val);
@@ -607,15 +630,15 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
 
         // 1. Zod Validation
         try {
-            // We use partial() because the schema might be incomplete vs the massive form
+            // Usamos partial() porque el esquema podría estar incompleto respecto al formulario completo.
             // But for the fields explicitly defined in the schema, we want strict validation.
             // Using residentSchema directly. Unknown keys are stripped by default in Zod unless passthrough() is used.
             // Since we send everything to backend, we should technically use the schema to validate, 
             // but the schema only covers Tab 0 and 1 so far.
-            // Strategy: Validate what we have schemas for. 
+            // Estrategia: validar lo que el esquema define.
 
-            // For now, let's allow unknown keys until we map everything, otherwise valid fields will be stripped if we use the output.
-            // We just want to check for ERRORS in the known fields.
+            // Por ahora, permitimos claves desconocidas hasta que todo esté mapeado.
+            // Solo queremos detectar ERRORES en los campos conocidos.
             // residentSchema is a ZodEffects object, so it automatically ignores unknown keys (strip),
             // but we don't use the output, we just want to validate.
             // passthrough() is not available on ZodEffects.
@@ -640,7 +663,7 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                 const firstErrorKey = Object.keys(newErrors)[0];
                 if (firstErrorKey) {
                     // 1. Determine Tab
-                    let targetTab = 0; // Default
+                    let targetTab = 0; // Por defecto, primera pestaña
                     Object.entries(FIELD_TAB_MAP).forEach(([tabIndex, fields]) => {
                         if (fields.includes(firstErrorKey)) targetTab = parseInt(tabIndex);
                     });
@@ -665,7 +688,7 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                                 element.classList.remove(...highlightClasses);
                             }, 2500);
                         }
-                    }, 150); // Small delay for React render
+                    }, 150); // Pequeño retardo para que React complete el renderizado
 
                     setError(`Error en: ${FIELD_LABELS[firstErrorKey] || firstErrorKey}`);
                 } else {
@@ -686,12 +709,12 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
             // Extended numeric fields list for safety
             const numericFields = [
                 'device_oxygen_flow', 'device_oxygen_hours', 'dysphagia_grade', 'weight', 'height', 'bmi',
-                'urinary_incontinence_frequency', 'fecal_incontinence_frequency', 'diaper_changes_per_day', 'bath_frequency',
+                'diaper_changes_per_day', 'bath_frequency',
                 'mmse_score', 'pfeiffer_score', 'pain_eva'
             ];
 
             Object.keys(cleanedData).forEach(key => {
-                // Convert empty strings to null for specific fields to avoid 'null' strings in DB
+                // Convertir strings vacíos a null en campos específicos para evitar 'null' strings en BD
                 const value = cleanedData[key];
                 const isStringEmpty = typeof value === 'string' && value.trim() === '';
                 
@@ -716,13 +739,13 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                 // Calculate diff - only send fields that actually changed
                 const dirtyFields = {};
 
-                // Helper: Normalize empty values (null, undefined, "") to null for comparison
+                // Auxiliar: normalizar valores vacíos (null, undefined, "") a null para comparación
                 const normalizeEmpty = (val) => {
                     if (val === null || val === undefined || val === '') return null;
                     return val;
                 };
 
-                // Helper: Deep compare for objects/arrays
+                // Auxiliar: comparación profunda para objetos/arrays
                 // Mejorado: Comparación más robusta para detectar cambios reales
                 const isDifferent = (val1, val2) => {
                     // Normalizamos ambos valores para comparación base
@@ -730,7 +753,7 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                         // Importante: No normalizar booleano false a null
                         if (typeof val === 'boolean') return val;
                         if (val === null || val === undefined || String(val).trim() === '') return null;
-                        // For numbers, ensure we compare numerically or as normalized strings
+                        // Para números, comparar numéricamente o como strings normalizados
                         if (typeof val === 'number') return val;
                         return String(val).trim();
                     };
@@ -758,7 +781,7 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                     }
                 });
 
-                // Force include medical_history if it exists and wasn't caught (extra safety)
+                // IMPORTANTE: incluir siempre medical_history si existe (por seguridad adicional)
                 if (cleanedData.medical_history && cleanedData.medical_history.length > 0) {
                     dirtyFields['medical_history'] = cleanedData.medical_history;
                 }
@@ -789,8 +812,16 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
             }
         } catch (err) {
             console.error("Error completo:", err);
+            setLoading(false);
 
-            // Manejar errores de validación de FastAPI/Pydantic
+            // 1. Manejar 403 Forbidden (RBAC Backend) - Requerido por Manual Técnico
+            if (err.response?.status === 403) {
+                setError("ACCESO DENEGADO: No tiene permisos suficientes para realizar esta operación o modificar estos campos restringidos.");
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
+            // 2. Manejar errores de validación de FastAPI/Pydantic
             const detail = err.response?.data?.detail;
 
             if (Array.isArray(detail)) {
@@ -807,7 +838,7 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
                 const firstErrorField = detail[0]?.loc ? detail[0].loc[detail[0].loc.length - 1] : null;
                 if (firstErrorField) {
                     // 1. Determine Tab
-                    let targetTab = 0; // Default
+                    let targetTab = 0; // Por defecto, primera pestaña
                     Object.entries(FIELD_TAB_MAP).forEach(([tabIndex, fields]) => {
                         if (fields.includes(firstErrorField)) targetTab = parseInt(tabIndex);
                     });
@@ -980,34 +1011,9 @@ export default function ResidentForm({ onSubmit, onCancel, initialData, initialT
             <div className="mt-6 border-t pt-6 space-y-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Antecedentes Médicos y Quirúrgicos</h3>
                 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Otras Enfermedades (Texto)</label>
-                    <textarea
-                        name="other_diseases"
-                        value={formData.other_diseases || ''}
-                        onChange={handleChange}
-                        rows="3"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                        placeholder="Describa otras patologías crónicas o agudas relevantes..."
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Antecedentes Quirúrgicos (Operaciones)</label>
-                    <textarea
-                        name="surgical_history"
-                        value={formData.surgical_history || ''}
-                        onChange={handleChange}
-                        rows="3"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                        placeholder="Liste las intervenciones quirúrgicas previas..."
-                    />
-                </div>
-
                 <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Historial Detallado (Legacy/Listado)</label>
                     <DynamicListInput
-                        label="Historial de Enfermedades y Cirugías Previas"
+                        label=""
                         items={formData.medical_history || []}
                         onChange={(newItems) => {
                             setFormData(prev => ({ ...prev, medical_history: newItems }));

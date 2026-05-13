@@ -41,9 +41,7 @@ def upgrade() -> None:
         except Exception:
             pass
         try:
-            op.drop_index(
-                op.f("ix_resident_devices_id"), table_name="resident_devices"
-            )
+            op.drop_index(op.f("ix_resident_devices_id"), table_name="resident_devices")
         except Exception:
             pass
         try:
@@ -61,28 +59,18 @@ def downgrade() -> None:
     op.create_table(
         "resident_devices",
         sa.Column("id", sa.INTEGER(), autoincrement=True, nullable=False),
-        sa.Column(
-            "resident_id", sa.INTEGER(), autoincrement=False, nullable=True
-        ),
-        sa.Column(
-            "device_type", sa.VARCHAR(), autoincrement=False, nullable=True
-        ),
-        sa.Column(
-            "device_name", sa.VARCHAR(), autoincrement=False, nullable=True
-        ),
+        sa.Column("resident_id", sa.INTEGER(), autoincrement=False, nullable=True),
+        sa.Column("device_type", sa.VARCHAR(), autoincrement=False, nullable=True),
+        sa.Column("device_name", sa.VARCHAR(), autoincrement=False, nullable=True),
         sa.Column(
             "specifications",
             postgresql.JSONB(astext_type=sa.Text()),
             autoincrement=False,
             nullable=True,
         ),
-        sa.Column(
-            "installation_date", sa.DATE(), autoincrement=False, nullable=True
-        ),
+        sa.Column("installation_date", sa.DATE(), autoincrement=False, nullable=True),
         sa.Column("active", sa.BOOLEAN(), autoincrement=False, nullable=True),
-        sa.Column(
-            "deactivation_date", sa.DATE(), autoincrement=False, nullable=True
-        ),
+        sa.Column("deactivation_date", sa.DATE(), autoincrement=False, nullable=True),
         sa.Column("notes", sa.TEXT(), autoincrement=False, nullable=True),
         sa.Column(
             "created_at",

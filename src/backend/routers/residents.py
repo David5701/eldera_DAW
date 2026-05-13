@@ -1,5 +1,5 @@
-from datetime import date, datetime, timedelta
 import traceback
+from datetime import date, datetime
 from typing import Optional
 
 import auth
@@ -14,7 +14,6 @@ from fastapi import (
     Depends,
     File,
     HTTPException,
-    Path,
     Query,
     Request,
     UploadFile,
@@ -116,18 +115,22 @@ def get_all_followups(
     if not permissions.has_permission("view_resident_basic", current_user.role):
         raise HTTPException(status_code=403, detail="Permiso denegado")
 
-    query = db.query(
-        models_extended.ResidentFollowUp,
-        models.Resident.name,
-        models.Resident.surname,
-        models.Resident.room_number,
-        models.User.username,
-    ).filter(
-        models.Resident.id == models_extended.ResidentFollowUp.resident_id,
-        models_extended.ResidentFollowUp.residence_id
-        == current_user.residence_id,
-    ).outerjoin(
-        models.User, models_extended.ResidentFollowUp.user_id == models.User.id
+    query = (
+        db.query(
+            models_extended.ResidentFollowUp,
+            models.Resident.name,
+            models.Resident.surname,
+            models.Resident.room_number,
+            models.User.username,
+        )
+        .filter(
+            models.Resident.id == models_extended.ResidentFollowUp.resident_id,
+            models_extended.ResidentFollowUp.residence_id == current_user.residence_id,
+        )
+        .outerjoin(
+            models.User,
+            models_extended.ResidentFollowUp.user_id == models.User.id,
+        )
     )
 
     q_final = q or search
@@ -159,26 +162,26 @@ def get_all_followups(
         )
 
     try:
-        results = query.order_by(
-            models_extended.ResidentFollowUp.created_at.desc()
-        ).all()
+        results = query.order_by(models_extended.ResidentFollowUp.created_at.desc()).all()
 
         followups = []
         for f, name, surname, room, username in results:
             # Manual construction to ensure stability and match global schema
-            followups.append({
-                "id": f.id,
-                "resident_id": f.resident_id,
-                "content": f.content,
-                "type": f.type,
-                "staff_name": username or f.staff_name or "Sistema",
-                "resident_name": name or "Residente",
-                "resident_surname": surname or "",
-                "resident_room": room or "---",
-                "user_id": f.user_id,
-                "created_at": f.created_at.isoformat() if f.created_at else None,
-                "updated_at": f.updated_at.isoformat() if f.updated_at else None
-            })
+            followups.append(
+                {
+                    "id": f.id,
+                    "resident_id": f.resident_id,
+                    "content": f.content,
+                    "type": f.type,
+                    "staff_name": username or f.staff_name or "Sistema",
+                    "resident_name": name or "Residente",
+                    "resident_surname": surname or "",
+                    "resident_room": room or "---",
+                    "user_id": f.user_id,
+                    "created_at": f.created_at.isoformat() if f.created_at else None,
+                    "updated_at": f.updated_at.isoformat() if f.updated_at else None,
+                }
+            )
 
         return followups
     except Exception as e:
@@ -186,8 +189,8 @@ def get_all_followups(
         traceback.print_exc()
         raise HTTPException(
             status_code=500,
-            detail=f"Error interno al cargar todos los seguimientos: {str(e)}"
-        )
+            detail=f"Error interno al cargar todos los seguimientos: {str(e)}",
+        ) from e
 
 
 @router.post("/", response_model=schemas_extended.ResidentExtended)
@@ -242,14 +245,18 @@ async def delete_resident(
 def read_residents(
     skip: int = 0,
     limit: int = 100,
-    q: Optional[str] = Query(
-        None, description="Término de búsqueda para nombre o apellidos"
-    ),
+    q: Optional[str] = Query(None, description="Término de búsqueda para nombre o apellidos"),
     room: Optional[str] = Query(None, description="Filtrar por número de habitación"),
-    fil_status: Optional[str] = Query(None, alias="status", description="Filtrar por estado (active, hospitalized, inactive, deceased)"),
+    fil_status: Optional[str] = Query(
+        None,
+        alias="status",
+        description="Filtrar por estado (active, hospitalized, inactive, deceased)",
+    ),
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
-    source: Optional[str] = Query(None, description="Origen de la navegación (dashboard, profile, etc.)"),
+    source: Optional[str] = Query(
+        None, description="Origen de la navegación (dashboard, profile, etc.)"
+    ),
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(auth.get_current_active_user),
     request: Request = None,
@@ -273,9 +280,13 @@ def read_residents(
                 q_term = f"%{term}%"
                 query = query.filter(
                     or_(
-                        func.public.unaccent(models.Resident.name).ilike(func.public.unaccent(q_term)),
-                        func.public.unaccent(models.Resident.surname).ilike(func.public.unaccent(q_term)),
-                        models.Resident.room_number.ilike(q_term)
+                        func.public.unaccent(models.Resident.name).ilike(
+                            func.public.unaccent(q_term)
+                        ),
+                        func.public.unaccent(models.Resident.surname).ilike(
+                            func.public.unaccent(q_term)
+                        ),
+                        models.Resident.room_number.ilike(q_term),
                     )
                 )
         if room:
@@ -285,9 +296,7 @@ def read_residents(
             query = query.filter(models.Resident.status == fil_status)
 
         # Retornar resultados paginados
-        return paginate(
-            query, schemas_extended.ResidentExtended, page=page, size=size
-        )
+        return paginate(query, schemas_extended.ResidentExtended, page=page, size=size)
     except Exception as e:
         import traceback
 
@@ -295,18 +304,14 @@ def read_residents(
         raise HTTPException(
             status_code=500,
             detail=f"ERROR CRÍTICO: {str(e)} TIPO: {type(e).__name__}",
-        )
+        ) from e
 
 
-@router.get(
-    "/lists/dynamic", response_model=list[schemas_extended.DynamicList]
-)
+@router.get("/lists/dynamic", response_model=list[schemas_extended.DynamicList])
 def get_dynamic_lists(
     type: Optional[str] = Query(
         None,
-        description=(
-            "Filtrar por tipo de lista: evacuación, dieta, enfermería, cumpleaños"
-        ),
+        description=("Filtrar por tipo de lista: evacuación, dieta, enfermería, cumpleaños"),
     ),
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(auth.get_current_active_user),
@@ -355,9 +360,7 @@ def get_dynamic_lists(
             "no": "No",
         }
         # Normalizar a minúsculas para búsqueda, mantener valor original si no existe traducción
-        value_lower = (
-            value.lower() if isinstance(value, str) else str(value).lower()
-        )
+        value_lower = value.lower() if isinstance(value, str) else str(value).lower()
         return translations.get(value_lower, value)
 
     # Helper to build resident summary
@@ -385,9 +388,11 @@ def get_dynamic_lists(
             .all()
         )
         items = [
-            build_resident_summary(r, {
-                "Detalle": r.diagnosis_hypertension_detail or "Sin especificar"
-            }) for r in residents
+            build_resident_summary(
+                r,
+                {"Detalle": r.diagnosis_hypertension_detail or "Sin especificar"},
+            )
+            for r in residents
         ]
         lists_to_return.append(
             schemas_extended.DynamicList(
@@ -413,7 +418,8 @@ def get_dynamic_lists(
                 r,
                 {
                     "Tipo": {"type1": "Tipo 1", "type2": "Tipo 2"}.get(
-                        r.diagnosis_diabetes_type or "", r.diagnosis_diabetes_type or "No especificado"
+                        r.diagnosis_diabetes_type or "",
+                        r.diagnosis_diabetes_type or "No especificado",
                     ),
                     "Insulina": "Sí" if r.supplement_diabetes else "No",
                 },
@@ -468,7 +474,8 @@ def get_dynamic_lists(
         residents = (
             db.query(models.Resident)
             .filter(
-                (models.Resident.requires_positioning.is_(True)) | (models.Resident.mobility_level == "bedridden"),
+                (models.Resident.requires_positioning.is_(True))
+                | (models.Resident.mobility_level == "bedridden"),
                 models.Resident.residence_id == current_user.residence_id,
             )
             .all()
@@ -480,9 +487,7 @@ def get_dynamic_lists(
                     "Frecuencia": f"Cada {r.positioning_frequency}h"
                     if r.positioning_frequency
                     else "Según pauta",
-                    "Colchón": "Antiescaras"
-                    if r.uses_anti_bedsore_mattress
-                    else "Normal",
+                    "Colchón": "Antiescaras" if r.uses_anti_bedsore_mattress else "Normal",
                 },
             )
             for r in residents
@@ -498,7 +503,7 @@ def get_dynamic_lists(
 
     # 5. CURES (Wound Care)
     if not type or type == "cures":
-        # Get all residents and filter in python to handle JSONB safely
+        # Obtener todos los residentes y filtrar en Python para gestionar JSONB de forma segura
         all_residents = (
             db.query(models.Resident)
             .filter(models.Resident.residence_id == current_user.residence_id)
@@ -510,17 +515,18 @@ def get_dynamic_lists(
             has_legacy = r.has_pressure_ulcers or r.has_surgical_wounds
 
             if has_wounds or has_legacy:
-                # Build summary string
+                # Construir cadena de resumen
                 wounds_summary = []
                 if r.wounds:
                     for w in r.wounds:
-                        w_str = f"{w.get('type', 'Herida')} {w.get('location', '')}: {w.get('cure_type', 'Sin pauta')} ({w.get('frequency', '')})"
+                        w_str = (
+                            f"{w.get('type', 'Herida')} {w.get('location', '')}: "
+                            f"{w.get('cure_type', 'Sin pauta')} ({w.get('frequency', '')})"
+                        )
                         wounds_summary.append(w_str)
                 elif has_legacy:
                     if r.has_pressure_ulcers:
-                        wounds_summary.append(
-                            f"UPP {r.upp_grade or ''} ({r.upp_cure_type or '?'})"
-                        )
+                        wounds_summary.append(f"UPP {r.upp_grade or ''} ({r.upp_cure_type or '?'})")
                     if r.has_surgical_wounds:
                         wounds_summary.append("Herida Qx")
 
@@ -528,12 +534,8 @@ def get_dynamic_lists(
                     build_resident_summary(
                         r,
                         {
-                            "Curas": "; ".join(wounds_summary)
-                            if wounds_summary
-                            else "Ver Ficha",
-                            "Riesgo UPP": f"Norton: {r.norton_score}"
-                            if r.norton_score
-                            else "-",
+                            "Curas": "; ".join(wounds_summary) if wounds_summary else "Ver Ficha",
+                            "Riesgo UPP": f"Norton: {r.norton_score}" if r.norton_score else "-",
                         },
                     )
                 )
@@ -554,9 +556,7 @@ def get_dynamic_lists(
             .filter(
                 models.Resident.residence_id == current_user.residence_id,
                 (
-                    (
-                        models.Resident.diet_normal.is_(False)
-                    )  # Not standard diet
+                    (models.Resident.diet_normal.is_(False))  # Not standard diet
                     | (models.Resident.diet_diabetic.is_(True))
                     | (models.Resident.diet_low_salt.is_(True))
                     | (models.Resident.diet_astringent.is_(True))
@@ -601,16 +601,8 @@ def get_dynamic_lists(
                     "Dieta": get_diet_label(r),
                     "Textura": get_texture_label(r),
                     "Alergias": (
-                        (
-                            (r.allergy_food_detail or "Sí")
-                            if r.has_food_allergy
-                            else ""
-                        )
-                        + (
-                            ", "
-                            if r.has_food_allergy and r.has_food_intolerance
-                            else ""
-                        )
+                        ((r.allergy_food_detail or "Sí") if r.has_food_allergy else "")
+                        + (", " if r.has_food_allergy and r.has_food_intolerance else "")
                         + (
                             f"Intolerancia: {r.intolerance_food_detail or '?'}"
                             if r.has_food_intolerance
@@ -641,6 +633,7 @@ def get_dynamic_lists(
             )
             .all()
         )
+
         def translate_diaper_type(val):
             _tipos = {
                 "anatomy": "Anatómico",
@@ -680,21 +673,26 @@ def get_dynamic_lists(
             .all()
         )
         birthday_residents = [
-            r
-            for r in residents
-            if r.date_of_birth and r.date_of_birth.month == current_month
+            r for r in residents if r.date_of_birth and r.date_of_birth.month == current_month
         ]
         items = [
-            build_resident_summary(
-                r, {"Cumpleaños": r.date_of_birth.strftime("%d/%m")}
-            )
+            build_resident_summary(r, {"Cumpleaños": r.date_of_birth.strftime("%d/%m")})
             for r in birthday_residents
         ]
         # Traducir el nombre del mes al español
         _meses_es = {
-            1: "Enero", 2: "Febrero", 3: "Marzo", 4: "Abril",
-            5: "Mayo", 6: "Junio", 7: "Julio", 8: "Agosto",
-            9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre"
+            1: "Enero",
+            2: "Febrero",
+            3: "Marzo",
+            4: "Abril",
+            5: "Mayo",
+            6: "Junio",
+            7: "Julio",
+            8: "Agosto",
+            9: "Septiembre",
+            10: "Octubre",
+            11: "Noviembre",
+            12: "Diciembre",
         }
         _mes_actual = _meses_es.get(datetime.now().month, "")
         lists_to_return.append(
@@ -723,11 +721,18 @@ def export_residents(
         .all()
     )
     if format == "pdf":
+        import io
+
         from reportlab.lib import colors
         from reportlab.lib.pagesizes import A4
         from reportlab.lib.styles import getSampleStyleSheet
-        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-        import io
+        from reportlab.platypus import (
+            Paragraph,
+            SimpleDocTemplate,
+            Spacer,
+            Table,
+            TableStyle,
+        )
 
         output = io.BytesIO()
         doc = SimpleDocTemplate(output, pagesize=A4)
@@ -735,49 +740,55 @@ def export_residents(
         styles = getSampleStyleSheet()
 
         # Title
-        title = Paragraph(f"Listado de Residentes - {current_user.residence_id}", styles['Title'])
+        title = Paragraph(
+            f"Listado de Residentes - {current_user.residence_id}",
+            styles["Title"],
+        )
         elements.append(title)
         elements.append(Spacer(1, 12))
 
         # Table Header
         data = [["Nombre", "Apellidos", "Habitación", "Estado"]]
         for r in residents:
-            data.append([
-                r.name, 
-                r.surname, 
-                r.room_number or "-", 
-                r.status.capitalize() if r.status else "-"
-            ])
+            data.append(
+                [
+                    r.name,
+                    r.surname,
+                    r.room_number or "-",
+                    r.status.capitalize() if r.status else "-",
+                ]
+            )
 
         t = Table(data)
-        t.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.blue),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
-        ]))
+        t.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.blue),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                    ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("FONTSIZE", (0, 0), (-1, 0), 12),
+                    ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+                    ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+                    ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                    ("FONTSIZE", (0, 1), (-1, -1), 10),
+                ]
+            )
+        )
         elements.append(t)
         doc.build(elements)
-        
+
         pdf_content = output.getvalue()
         output.close()
-        
+
         return Response(
             content=pdf_content,
             media_type="application/pdf",
-            headers={"Content-Disposition": "attachment; filename=listado_residentes.pdf"}
+            headers={"Content-Disposition": "attachment; filename=listado_residentes.pdf"},
         )
 
     if format == "json":
-        return [
-            schemas_extended.ResidentExtended.model_validate(r).model_dump()
-            for r in residents
-        ]
+        return [schemas_extended.ResidentExtended.model_validate(r).model_dump() for r in residents]
 
     import csv
     import io
@@ -808,8 +819,9 @@ def export_residents(
     return Response(
         content=output.getvalue(),
         media_type="text/csv",
-        headers={"Content-Disposition": f"attachment; filename=residentes.{format}"}
+        headers={"Content-Disposition": f"attachment; filename=residentes.{format}"},
     )
+
 
 @router.post("/import")
 async def import_residents(
@@ -820,9 +832,7 @@ async def import_residents(
     if not permissions.has_permission("import_resident", current_user.role):
         raise HTTPException(status_code=403, detail="Permission denied")
     if file.content_type != "text/csv":
-        raise HTTPException(
-            status_code=400, detail="Only CSV files are supported"
-        )
+        raise HTTPException(status_code=400, detail="Only CSV files are supported")
     import csv
     import io
 
@@ -901,9 +911,7 @@ def update_resident(
     # Si pasa de 'hospitalized' a 'active', guardar historial
     new_status = raw_data.get("status")
     if db_resident.status == "hospitalized" and new_status == "active":
-        print(
-            f"DEBUG: Processing Hospital Discharge for Resident {resident_id}"
-        )
+        print(f"DEBUG: Processing Hospital Discharge for Resident {resident_id}")
 
         # 1. Determinar fecha fin
         end_date = raw_data.get("hospitalization_end_date") or date.today()
@@ -913,18 +921,14 @@ def update_resident(
             "start": db_resident.hospitalization_date.isoformat()
             if db_resident.hospitalization_date
             else None,
-            "end": end_date.isoformat()
-            if isinstance(end_date, date)
-            else end_date,
+            "end": end_date.isoformat() if isinstance(end_date, date) else end_date,
             "hospital": db_resident.hospitalization_hospital,
             "reason": db_resident.hospitalization_reason,
         }
 
         # 3. Actualizar historial (asegurar que es lista)
         current_history = (
-            list(db_resident.hospitalization_history)
-            if db_resident.hospitalization_history
-            else []
+            list(db_resident.hospitalization_history) if db_resident.hospitalization_history else []
         )
         current_history.append(history_entry)
 
@@ -941,7 +945,7 @@ def update_resident(
         # hospitalization_notes removed
 
         # Eliminar campos de hospitalización del raw_data para que no interfieran
-        # (aunque si los seteamos a None aquí, el loop de abajo los pondría a None, lo cual es correcto)
+        # (aunque si los seteamos a None aquí, el loop de abajo los pondría a None)
 
     update_data = raw_data
     for key, value in update_data.items():
@@ -975,9 +979,7 @@ def update_resident(
     return db_resident
 
 
-@router.patch(
-    "/{resident_id}", response_model=schemas_extended.ResidentExtended
-)
+@router.patch("/{resident_id}", response_model=schemas_extended.ResidentExtended)
 def partial_update_resident(
     resident_id: int,
     resident: schemas_extended.ResidentUpdateExtended,
@@ -1000,7 +1002,7 @@ def partial_update_resident(
     if db_resident is None:
         raise HTTPException(status_code=404, detail="Resident not found")
 
-    # Only update fields that were explicitly set (exclude_unset=True)
+    # Solo actualizar los campos que se han enviado explícitamente (exclude_unset=True)
     update_data = resident.model_dump(exclude_unset=True)
     print(f"DEBUG: [PATCH] Resident ID={resident_id} | Payload Recibido: {update_data}")
 
@@ -1015,18 +1017,14 @@ def partial_update_resident(
             "start": db_resident.hospitalization_date.isoformat()
             if db_resident.hospitalization_date
             else None,
-            "end": end_date.isoformat()
-            if isinstance(end_date, date)
-            else end_date,
+            "end": end_date.isoformat() if isinstance(end_date, date) else end_date,
             "hospital": db_resident.hospitalization_hospital,
             "reason": db_resident.hospitalization_reason,
         }
 
         # 3. Actualizar historial
         current_history = (
-            list(db_resident.hospitalization_history)
-            if db_resident.hospitalization_history
-            else []
+            list(db_resident.hospitalization_history) if db_resident.hospitalization_history else []
         )
         current_history.append(history_entry)
         db_resident.hospitalization_history = current_history
@@ -1039,7 +1037,8 @@ def partial_update_resident(
         # hospitalization_notes removed
 
     for key, value in update_data.items():
-        # Si estamos dando de alta, ignorar updates a campos de hospitalización que vendrían del form (que a veces manda los datos viejos)
+        # Si estamos dando de alta, ignorar updates a campos de hospitalización
+        # que vendrían del form (que a veces manda los datos viejos)
         if key.startswith("hospitalization_") and new_status == "active":
             continue
 
@@ -1047,7 +1046,11 @@ def partial_update_resident(
         if key == "status" and value in ["inactive", "deceased"]:
             if not update_data.get("inactive_date") and not db_resident.inactive_date:
                 db_resident.inactive_date = date.today()
-            if value == "deceased" and not update_data.get("inactive_reason") and not db_resident.inactive_reason:
+            if (
+                value == "deceased"
+                and not update_data.get("inactive_reason")
+                and not db_resident.inactive_reason
+            ):
                 db_resident.inactive_reason = "Defunción registrada"
 
             if db_resident.status == "hospitalized":
@@ -1063,9 +1066,7 @@ def partial_update_resident(
     return db_resident
 
 
-@router.post(
-    "/{resident_id}/photo", response_model=schemas_extended.ResidentExtended
-)
+@router.post("/{resident_id}/photo", response_model=schemas_extended.ResidentExtended)
 async def upload_resident_photo(
     resident_id: int,
     file: UploadFile = File(...),
@@ -1095,28 +1096,22 @@ async def upload_resident_photo(
             detail="Only JPEG, PNG and WebP images are allowed",
         )
 
-    # Delete old photo if exists
+    # Eliminar la foto antigua si existe
     if resident.profile_photo:
         await storage_service.delete_file(resident.profile_photo)
 
-    # Save new photo
-    # Create filename: resident_{id}_{timestamp}.ext
+    # Guardar la nueva foto
+    # Crear el nombre de archivo: resident_{id}_{timestamp}.ext
     ext = file.filename.split(".")[-1]
-    filename = (
-        f"resident_{resident_id}_{int(datetime.now().timestamp())}.{ext}"
-    )
+    filename = f"resident_{resident_id}_{int(datetime.now().timestamp())}.{ext}"
 
-    # Save to "photos/{resident_id}" directory
+    # Guardar en el directorio "photos/{resident_id}"
     try:
-        file_url = await storage_service.save_file(
-            file, f"photos/{resident_id}", filename
-        )
+        file_url = await storage_service.save_file(file, f"photos/{resident_id}", filename)
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Could not save file: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Could not save file: {str(e)}") from e
 
-    # Update DB
+    # Actualizar la base de datos
     resident.profile_photo = file_url
     db.commit()
     db.refresh(resident)
@@ -1148,19 +1143,21 @@ def get_resident_followups(
         raise HTTPException(status_code=403, detail="Permiso denegado")
 
     try:
-        query = db.query(models_extended.ResidentFollowUp, models.User.username).filter(
-            models_extended.ResidentFollowUp.resident_id == resident_id,
-            models_extended.ResidentFollowUp.residence_id
-            == current_user.residence_id,
-        ).outerjoin(
-            models.User, models_extended.ResidentFollowUp.user_id == models.User.id
+        query = (
+            db.query(models_extended.ResidentFollowUp, models.User.username)
+            .filter(
+                models_extended.ResidentFollowUp.resident_id == resident_id,
+                models_extended.ResidentFollowUp.residence_id == current_user.residence_id,
+            )
+            .outerjoin(
+                models.User,
+                models_extended.ResidentFollowUp.user_id == models.User.id,
+            )
         )
 
         q_final = q or search
         if q_final:
-            query = query.filter(
-                models_extended.ResidentFollowUp.content.ilike(f"%{q_final}%")
-            )
+            query = query.filter(models_extended.ResidentFollowUp.content.ilike(f"%{q_final}%"))
 
         if type:
             query = query.filter(models_extended.ResidentFollowUp.type == type)
@@ -1179,23 +1176,23 @@ def get_resident_followups(
                 <= datetime.combine(end_date, datetime.max.time())
             )
 
-        results = query.order_by(
-            models_extended.ResidentFollowUp.created_at.desc()
-        ).all()
+        results = query.order_by(models_extended.ResidentFollowUp.created_at.desc()).all()
 
         followups = []
         for f, username in results:
             # Manual construction to ensure serializability and no Pydantic overhead
-            followups.append({
-                "id": f.id,
-                "resident_id": f.resident_id,
-                "content": f.content,
-                "type": f.type,
-                "staff_name": username or f.staff_name or "Sistema",
-                "user_id": f.user_id,
-                "created_at": f.created_at.isoformat() if f.created_at else None,
-                "updated_at": f.updated_at.isoformat() if f.updated_at else None
-            })
+            followups.append(
+                {
+                    "id": f.id,
+                    "resident_id": f.resident_id,
+                    "content": f.content,
+                    "type": f.type,
+                    "staff_name": username or f.staff_name or "Sistema",
+                    "user_id": f.user_id,
+                    "created_at": f.created_at.isoformat() if f.created_at else None,
+                    "updated_at": f.updated_at.isoformat() if f.updated_at else None,
+                }
+            )
 
         return followups
     except Exception as e:
@@ -1203,8 +1200,8 @@ def get_resident_followups(
         traceback.print_exc()
         raise HTTPException(
             status_code=500,
-            detail=f"Error interno al cargar seguimientos: {str(e)}"
-        )
+            detail=f"Error interno al cargar seguimientos: {str(e)}",
+        ) from e
 
 
 @router.post(
@@ -1221,7 +1218,8 @@ def create_resident_followup(
 ):
     # DEBUG
     print(
-        f"DEBUG: create_followup | user={current_user.username} role={current_user.role} type={followup.type}"
+        f"DEBUG: create_followup | user={current_user.username} "
+        f"role={current_user.role} type={followup.type}"
     )
 
     # Verificación de permisos para acceso a la residencia
@@ -1232,13 +1230,15 @@ def create_resident_followup(
     if current_user.role == "nurse" and followup.type != "nursing":
         raise HTTPException(
             status_code=403,
-            detail=f"Enfermería solo puede registrar seguimientos de enfermería. (Rol: {current_user.role}, Tipo: {followup.type})",
+            detail=f"Enfermería solo puede registrar seguimientos de enfermería. "
+            f"(Rol: {current_user.role}, Tipo: {followup.type})",
         )
 
     if current_user.role == "aux" and followup.type != "auxiliar":
         raise HTTPException(
             status_code=403,
-            detail=f"Auxiliares solo pueden registrar seguimientos auxiliares. (Rol: {current_user.role}, Tipo: {followup.type})",
+            detail=f"No tiene permisos para el tipo de seguimiento solicitado. "
+            f"(Rol: {current_user.role}, Tipo: {followup.type})",
         )
 
     # Admins can post any type but default to 'admin' if not specified (already in schema)
@@ -1260,9 +1260,7 @@ def create_resident_followup(
     return db_followup
 
 
-@router.post(
-    "/{resident_id}/vitals", response_model=schemas_extended.VitalSign
-)
+@router.post("/{resident_id}/vitals", response_model=schemas_extended.VitalSign)
 def create_vital_sign(
     resident_id: int,
     vital: schemas_extended.VitalSignCreate,
@@ -1274,11 +1272,15 @@ def create_vital_sign(
     if not permissions.has_permission("manage_vitals", current_user.role):
         raise HTTPException(status_code=403, detail="Permission denied")
 
-    # Check if resident belongs to residence
-    resident = db.query(models.Resident).filter(
-        models.Resident.id == resident_id,
-        models.Resident.residence_id == current_user.residence_id
-    ).first()
+    # Verificar que el residente pertenece a la residencia del usuario
+    resident = (
+        db.query(models.Resident)
+        .filter(
+            models.Resident.id == resident_id,
+            models.Resident.residence_id == current_user.residence_id,
+        )
+        .first()
+    )
     if not resident:
         raise HTTPException(status_code=404, detail="Resident not found")
 
@@ -1311,17 +1313,21 @@ def create_vital_signs_batch(
     background_tasks: BackgroundTasks = None,
 ):
     print(f"DEBUG: Batch create vitals for resident {resident_id}. Payload size: {len(vitals)}")
-    
+
     if not permissions.has_permission("manage_vitals", current_user.role):
         raise HTTPException(status_code=403, detail="Permission denied")
 
     try:
-        # Check if resident belongs to residence
-        resident = db.query(models.Resident).filter(
-            models.Resident.id == resident_id,
-            models.Resident.residence_id == current_user.residence_id
-        ).first()
-        
+        # Verificar que el residente pertenece a la residencia del usuario
+        resident = (
+            db.query(models.Resident)
+            .filter(
+                models.Resident.id == resident_id,
+                models.Resident.residence_id == current_user.residence_id,
+            )
+            .first()
+        )
+
         if not resident:
             raise HTTPException(status_code=404, detail="Resident not found")
 
@@ -1347,20 +1353,19 @@ def create_vital_signs_batch(
             db.commit()
             for v in created_vitals:
                 db.refresh(v)
-        
+
         return created_vitals
-        
+
     except Exception as e:
         print(f"CRITICAL ERROR in batch vitals: {str(e)}")
         import traceback
+
         traceback.print_exc()
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}") from e
 
 
-@router.get(
-    "/{resident_id}/vitals", response_model=list[schemas_extended.VitalSign]
-)
+@router.get("/{resident_id}/vitals", response_model=list[schemas_extended.VitalSign])
 def get_resident_vitals(
     resident_id: int,
     silent: Optional[bool] = Query(False, description="Skip audit log"),
@@ -1398,13 +1403,11 @@ def get_resident_vitals(
         traceback.print_exc()
         raise HTTPException(
             status_code=500,
-            detail=f"Error interno al obtener constantes: {str(e)}"
-        )
+            detail=f"Error interno al obtener constantes: {str(e)}",
+        ) from e
 
 
-@router.post(
-    "/{resident_id}/care-logs", response_model=schemas_extended.CareLog
-)
+@router.post("/{resident_id}/care-logs", response_model=schemas_extended.CareLog)
 def create_care_log(
     resident_id: int,
     log: schemas_extended.CareLogCreate,
@@ -1432,9 +1435,7 @@ def create_care_log(
     return db_log
 
 
-@router.get(
-    "/{resident_id}/care-logs", response_model=list[schemas_extended.CareLog]
-)
+@router.get("/{resident_id}/care-logs", response_model=list[schemas_extended.CareLog])
 def get_resident_care_logs(
     resident_id: int,
     silent: Optional[bool] = Query(False, description="Skip audit log"),
@@ -1472,5 +1473,5 @@ def get_resident_care_logs(
         traceback.print_exc()
         raise HTTPException(
             status_code=500,
-            detail=f"Error interno al obtener cuidados: {str(e)}"
-        )
+            detail=f"Error interno al obtener cuidados: {str(e)}",
+        ) from e

@@ -233,52 +233,55 @@ export const MobilitySection = ({ formData, handleChange }) => (
 
         <div>
             <h3 className="text-lg font-semibold text-slate-800 mb-4">Dispositivos Invasivos</h3>
-            <div className="bg-red-50 p-4 rounded-2xl border border-red-200">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+            <div className="bg-red-50 p-6 rounded-2xl border border-red-200">
+                <div className="grid grid-cols-1 gap-4">
                     {[
                         { key: 'device_nasogastric', label: 'Sonda Nasogástrica' },
-                        { key: 'device_veis', label: 'VEIS (Vía Subcutánea)' },
+                        { key: 'device_veis', label: 'VEIS (Subcutánea)' },
                         { key: 'device_catheter', label: 'Sonda Vesical' },
                         { key: 'device_peg', label: 'PEG (Gastrostomía)' },
                         { key: 'device_tracheostomy', label: 'Traqueostomía' }
                     ].map(({ key, label }) => (
-                        <label key={key} className="flex items-center space-x-2 cursor-pointer p-2 hover:bg-red-100 rounded transition-colors">
-                            <input
-                                type="checkbox"
-                                name={key}
-                                checked={formData[key]}
-                                onChange={handleChange}
-                                className="w-4 h-4 text-red-600 rounded"
-                            />
-                            <span className="text-slate-700 font-medium">{label}</span>
-                        </label>
+                        <div key={key} className="space-y-3 p-3 bg-white/50 rounded-xl border border-red-100">
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    name={key}
+                                    checked={formData[key]}
+                                    onChange={handleChange}
+                                    className="w-5 h-5 text-red-600 rounded"
+                                />
+                                <span className="text-slate-800 font-bold">{label}</span>
+                            </label>
+                            
+                            {formData[key] && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-7 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div>
+                                        <label className="block text-xs font-black text-red-800 uppercase mb-1">Tipo / Detalles</label>
+                                        <input
+                                            type="text"
+                                            name={`${key}_type`}
+                                            value={formData[`${key}_type`] || ''}
+                                            onChange={handleChange}
+                                            placeholder="Ej: Silicona, Calibre 16..."
+                                            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-black text-red-800 uppercase mb-1">Fecha Último Cambio</label>
+                                        <input
+                                            type="date"
+                                            name={`${key}_date`}
+                                            value={formData[`${key}_date`] || ''}
+                                            onChange={handleChange}
+                                            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     ))}
                 </div>
-                {(formData.device_nasogastric || formData.device_veis || formData.device_catheter || formData.device_peg || formData.device_tracheostomy) && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-red-200 pt-4">
-                        <div>
-                            <label className="block text-sm text-slate-700 mb-1">Tipo Específico</label>
-                            <input
-                                type="text"
-                                name="device_invasive_type"
-                                value={formData.device_invasive_type}
-                                onChange={handleChange}
-                                placeholder="Ej: Silicona, Calibre 16..."
-                                className="w-full px-4 py-3 border border-slate-300 rounded-xl"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm text-slate-700 mb-1">Fecha Último Cambio</label>
-                            <input
-                                type="date"
-                                name="device_invasive_change_date"
-                                value={formData.device_invasive_change_date || ''}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-xl"
-                            />
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
     </div>
@@ -629,11 +632,11 @@ export const HygieneSection = ({ formData, handleChange }) => (
                 </div>
                 {formData.fecal_incontinence && (
                     <div className="ml-7">
-                        <label className="block text-sm text-slate-700 mb-1">Notas</label>
+                        <label className="block text-sm text-slate-700 mb-1">Notas / Observaciones</label>
                         <input
                             type="text"
-                            name="fecal_incontinence_frequency"
-                            value={formData.fecal_incontinence_frequency || ''}
+                            name="fecal_incontinence_notes"
+                            value={formData.fecal_incontinence_notes || ''}
                             onChange={handleChange}
                             placeholder="Ej: Diarreas frecuentes..."
                             className="w-full px-4 py-3 border border-slate-300 rounded-xl"
@@ -812,6 +815,16 @@ export const CognitiveSection = ({ formData, handleChange }) => (
                         />
                         <span className="font-medium text-slate-700">Agitación / Inquietud</span>
                     </label>
+                    {formData.behavior_agitation && (
+                        <input
+                            type="text"
+                            name="behavior_agitation_frequency"
+                            value={formData.behavior_agitation_frequency}
+                            onChange={handleChange}
+                            placeholder="Frecuencia / Observaciones..."
+                            className="w-full px-4 py-3 ml-6 text-sm border border-slate-300 rounded-xl"
+                        />
+                    )}
                 </div>
 
                 {/* Deambulacion */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Card from './Card';
 import Button from './Button';
 import { resolveStaticUrl } from '../utils/url';
@@ -25,6 +25,7 @@ export default function ResidentList({
     onPageChange
 }) {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [residenceName, setResidenceName] = useState('');
 
     const currentUserRole = (user?.role || '').toLowerCase().trim();
@@ -68,6 +69,7 @@ export default function ResidentList({
                                             <div className="absolute top-3 left-3 z-30">
                                                 <Link
                                                     to={`/residents/${resident.id}/edit?tab=0`}
+                                                    onClick={(e) => e.stopPropagation()}
                                                     className="bg-white text-emerald-500 w-10 h-10 rounded-xl shadow-sm border border-emerald-400 flex items-center justify-center hover:bg-emerald-50 hover:border-emerald-500 hover:scale-105 transition-all"
                                                     title="Editar Perfil"
                                                 >
@@ -76,8 +78,11 @@ export default function ResidentList({
                                             </div>
                                         )}
 
-                                        {/* Clickable Area */}
-                                        <Link to={`/residents/${resident.id}`} className="flex-1 p-4 flex flex-col items-center">
+                                        {/* Clickable Area - Use div instead of Link to avoid nesting */}
+                                        <div 
+                                            onClick={() => navigate(`/residents/${resident.id}`)}
+                                            className="flex-1 p-4 flex flex-col items-center cursor-pointer"
+                                        >
                                             <div className="absolute top-3 right-3 z-30">
                                                 <div className="bg-white shadow-sm text-[#0F172A] px-2.5 py-1.5 rounded-xl border border-[#0F172A] flex flex-col items-center min-w-[44px]">
                                                     <span className="text-[9px] font-bold uppercase tracking-wider opacity-60 leading-none mb-0.5">Hab.</span>
@@ -101,7 +106,12 @@ export default function ResidentList({
                                                     {/* Status Indicators */}
                                                     {resident.status === 'hospitalized' && (
                                                         <div className="absolute -bottom-2 inset-x-0 flex justify-center z-10 transition-transform hover:scale-110">
-                                                            <Link to="/hospitalized" className="bg-amber-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-white shadow-md flex items-center gap-1.5" title="Ver lista de hospitalizados">
+                                                            <Link 
+                                                                to="/hospitalized" 
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                className="bg-amber-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-white shadow-md flex items-center gap-1.5" 
+                                                                title="Ver lista de hospitalizados"
+                                                            >
                                                                 <Activity size={12} className="shrink-0" />
                                                                 <span className="truncate max-w-[110px]">{resident.hospitalization_hospital || 'Hospital'}</span>
                                                             </Link>
@@ -109,7 +119,12 @@ export default function ResidentList({
                                                     )}
                                                     {resident.status === 'deceased' && (
                                                         <div className="absolute -bottom-2 inset-x-0 flex justify-center z-10 transition-transform hover:scale-110">
-                                                            <Link to="/deceased" className="bg-rose-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-white shadow-md flex items-center gap-1.5" title="Ver lista de defunciones">
+                                                            <Link 
+                                                                to="/deceased" 
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                className="bg-rose-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-white shadow-md flex items-center gap-1.5" 
+                                                                title="Ver lista de defunciones"
+                                                            >
                                                                 <Skull size={12} className="shrink-0" />
                                                                 <span>Defunción</span>
                                                             </Link>
@@ -117,7 +132,12 @@ export default function ResidentList({
                                                     )}
                                                     {resident.status === 'inactive' && (
                                                         <div className="absolute -bottom-2 inset-x-0 flex justify-center z-10 transition-transform hover:scale-110">
-                                                            <Link to="/inactive" className="bg-slate-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-white shadow-md flex items-center gap-1.5" title="Ver lista de bajas">
+                                                            <Link 
+                                                                to="/inactive" 
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                className="bg-slate-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-white shadow-md flex items-center gap-1.5" 
+                                                                title="Ver lista de bajas"
+                                                            >
                                                                 <UserMinus size={12} className="shrink-0" />
                                                                 <span>Baja Temporal</span>
                                                             </Link>
@@ -136,7 +156,7 @@ export default function ResidentList({
                                                 </h3>
                                                 <p className="text-sm font-medium text-slate-500">{calculateAge(resident.date_of_birth)} años</p>
                                             </div>
-                                        </Link>
+                                        </div>
 
                                         {/* Footer: Action Buttons */}
                                         <div className="p-3 bg-[#0F172A] border-t border-slate-700 grid grid-cols-4 gap-2">

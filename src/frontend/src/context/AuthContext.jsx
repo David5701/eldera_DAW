@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(sessionStorage.getItem('token'));
     const [loading, setLoading] = useState(true);
 
-    // Setup Axios Interceptor
+    // Configuración del interceptor de Axios
     useEffect(() => {
         const interceptor = api.interceptors.request.use(
             (config) => {
@@ -56,11 +56,11 @@ export const AuthProvider = ({ children }) => {
             const response = await api.post('/token', formData);
             const { access_token } = response.data;
 
-            console.log("Login successful, token received");
+            console.log("Inicio de sesión exitoso, token recibido");
             sessionStorage.setItem('token', access_token);
             setToken(access_token);
 
-            // Fetch user immediately with explicit header to avoid race condition
+            // Obtener el usuario inmediatamente con cabecera explícita para evitar condición de carrera
             const userResponse = await api.get('/users/me', {
                 headers: { Authorization: `Bearer ${access_token}` }
             });
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        console.log("Logging out...");
+        console.log("Cerrando sesión...");
         sessionStorage.removeItem('token');
         setToken(null);
         setUser(null);

@@ -28,9 +28,7 @@ def upgrade() -> None:
     ]
 
     for table in tables:
-        op.execute(
-            f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS residence_id INTEGER"
-        )
+        op.execute(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS residence_id INTEGER")
         # Ensure it has a foreign key if we want to be strict,
         # but for idempotency in this project we've been using raw SQL alters.
         # We also need to sync the residence_id from the resident it belongs to.

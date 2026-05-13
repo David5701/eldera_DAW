@@ -22,11 +22,7 @@ async def login_for_access_token(
     db: Session = Depends(database.get_db),
 ):
     try:
-        user = (
-            db.query(models.User)
-            .filter(models.User.username == form_data.username)
-            .first()
-        )
+        user = db.query(models.User).filter(models.User.username == form_data.username).first()
 
         if not user:
             raise HTTPException(
@@ -54,11 +50,13 @@ async def login_for_access_token(
     except Exception as e:
         import traceback
 
-        error_msg = f"LOGIN CRASH: {str(e)} TYPE: {type(e).__name__} TRACE: {traceback.format_exc()}"
+        error_msg = (
+            f"LOGIN CRASH: {str(e)} TYPE: {type(e).__name__} TRACE: {traceback.format_exc()}"
+        )
         print(error_msg)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error_msg
-        )
+        ) from e
 
 
 @router.get("/users/me", response_model=schemas.User)

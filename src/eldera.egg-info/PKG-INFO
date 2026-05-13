@@ -1,3 +1,26 @@
+Metadata-Version: 2.4
+Name: eldera
+Version: 0.1.0
+Summary: Sistema de Gestión de Residencias de Ancianos
+Author-email: David <david@example.com>
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi
+Requires-Dist: uvicorn
+Requires-Dist: sqlalchemy
+Requires-Dist: psycopg2-binary
+Requires-Dist: python-multipart
+Requires-Dist: pydantic
+Requires-Dist: python-dotenv
+Requires-Dist: bcrypt
+Requires-Dist: pyjwt
+Requires-Dist: alembic
+Requires-Dist: supabase
+Provides-Extra: dev
+Requires-Dist: ruff; extra == "dev"
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: httpx; extra == "dev"
+
 # Eldera - Clinical Management Ecosystem
 
 Eldera es una plataforma avanzada de gestión clínica y administrativa diseñada específicamente para entornos residenciales geriátricos. El sistema ofrece un núcleo de software de alta disponibilidad, centrado en la seguridad del paciente y la eficiencia operativa del personal multidisciplinar.
@@ -119,65 +142,28 @@ El acceso a las funcionalidades clínicas está estrictamente regulado según el
 > [!NOTE]
 > Los auxiliares tienen permiso para registrar cuidados diarios, mientras que la toma de constantes está reservada a personal médico/enfermería. Los perfiles técnicos (Trabajo Social, Fisioterapia, Terapia Ocupacional, Psicología) acceden a la visualización global pero solo pueden editar las secciones del formulario de valoración correspondientes a su especialidad (ej: Psicología accede a P6: Cognitivo y P11: Valores y Creencias).
 
-## 📋 Calidad de Código y Tests
+## 🛡️ Calidad de Código y Tests
+El proyecto utiliza **Ruff** para linting y **Pytest/Vitest** para pruebas automatizadas.
 
-El sistema incluye una suite de pruebas automatizadas para garantizar la estabilidad tanto del backend como del frontend.
-
-### 🐍 Backend (Python)
-
-Validación de endpoints FastAPI, lógica de negocio y esquemas Pydantic.
-
+### Backend (Python)
+Para ejecutar los tests del servidor:
 ```bash
-# 1. Análisis estático de código (Ruff)
-uv run ruff check .
-
-# 2. Ejecutar suite completa de tests
+# Opción 1: Usando uv (recomendado)
 uv run pytest
+
+# Opción 2: Si estás usando Docker
+docker exec -it eldera_daw_backend pytest
 ```
 
-> [!NOTE]
-> Los tests del backend usan una base de datos SQLite en memoria, por lo que no requieren conexión a PostgreSQL. Se ejecutan de forma totalmente aislada.
-
-### ⚛️ Frontend (React / Vitest)
-
-Validación del entorno de renderizado, el DOM (jsdom) y la lógica RBAC del cliente.
-
+### Frontend (React)
+Para ejecutar los tests de la interfaz:
 ```bash
-# Desde el directorio src/frontend/
-npm test
+# Desde la carpeta src/frontend
+npx vitest run
 ```
 
-**¿Qué se prueba?**
-
-| Test | Descripción |
-|---|---|
-| Entorno Vitest | Verifica que el framework de tests arranca correctamente |
-| DOM disponible (jsdom) | Confirma que `document` está disponible para componentes React |
-| Lógica RBAC | Verifica la matriz de permisos por sección y rol (enfermería, auxiliar, trabajo social, psicología) |
-
-**Nota sobre el entorno (WSL):** El proyecto utiliza `pool: 'vmForks'` con `singleFork: true` en `vite.config.js`. Esta configuración es necesaria para evitar timeouts de workers en entornos WSL donde el proyecto reside en `/mnt/c/`. El tiempo de arranque puede alcanzar ~90 segundos (overhead de WSL), pero los tests en sí se ejecutan en milisegundos.
-
-**Resultado esperado:**
-```
-✓ src/tests/smoke.test.jsx (3 tests) 5ms
-  ✓ el entorno de tests está correctamente configurado
-  ✓ el DOM está disponible (jsdom)
-  ✓ lógica RBAC: los roles permitidos pueden editar secciones
-
-Test Files  1 passed (1)
-    Tests  3 passed (3)
-```
-
----
-
-## 🛡️ Validación de Seguridad (RBAC)
-
-El sistema implementa una estrategia de seguridad en dos capas:
-
-1.  **Protección Proactiva (Frontend)**: La interfaz bloquea automáticamente los campos según el rol del usuario (UX óptima). Esto evita que el usuario realice peticiones inválidas.
-2.  **Protección de Última Instancia (Backend)**: El servidor valida cada petición `PATCH`/`POST` mediante la función `has_permission()` en `permissions.py`. Si se intenta un acceso no autorizado directamente a la API, se devuelve un **HTTP 403 Forbidden**.
-3.  **Captura de Errores 403**: Si se fuerza una modificación no autorizada (ej. vía `curl` o Postman), el frontend capturará el error y mostrará un aviso de **"Acceso Denegado"**, evitando pantallas blancas.
-
+> [!TIP]
+> Si encuentras un error de `Permission denied` al ejecutar los tests del frontend, utiliza `npx vitest` en lugar de `npm test` para asegurar que el binario se ejecute correctamente en entornos WSL/Linux.
 
 ---
 *Proyecto desarrollado para la entrega académica final del Grado Superior en Desarrollo de Aplicaciones Web (DAW).*

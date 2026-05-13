@@ -133,7 +133,7 @@ export default function GeneralFollowups({ onBack, residentId = null, resident =
         return () => clearTimeout(timer);
     }, [startDate, endDate, typeFilter, searchQuery, residentId, fetchFollowups]);
 
-    // If resident prop is passed (e.g. from Profile), set it as selected
+    // Si se pasa la prop 'resident' (ej. desde el Perfil), establecerlo como seleccionado
     useEffect(() => {
         if (resident) {
             setSelectedResident(resident);

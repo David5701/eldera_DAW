@@ -62,19 +62,11 @@ def downgrade() -> None:
     op.create_table(
         "resident_documents",
         sa.Column("id", sa.INTEGER(), autoincrement=True, nullable=False),
-        sa.Column(
-            "resident_id", sa.INTEGER(), autoincrement=False, nullable=True
-        ),
-        sa.Column(
-            "document_type", sa.VARCHAR(), autoincrement=False, nullable=True
-        ),
+        sa.Column("resident_id", sa.INTEGER(), autoincrement=False, nullable=True),
+        sa.Column("document_type", sa.VARCHAR(), autoincrement=False, nullable=True),
         sa.Column("title", sa.VARCHAR(), autoincrement=False, nullable=True),
-        sa.Column(
-            "file_path", sa.VARCHAR(), autoincrement=False, nullable=True
-        ),
-        sa.Column(
-            "document_date", sa.DATE(), autoincrement=False, nullable=True
-        ),
+        sa.Column("file_path", sa.VARCHAR(), autoincrement=False, nullable=True),
+        sa.Column("document_date", sa.DATE(), autoincrement=False, nullable=True),
         sa.Column("notes", sa.TEXT(), autoincrement=False, nullable=True),
         sa.Column(
             "created_at",
@@ -82,9 +74,7 @@ def downgrade() -> None:
             autoincrement=False,
             nullable=True,
         ),
-        sa.Column(
-            "uploaded_by", sa.VARCHAR(), autoincrement=False, nullable=True
-        ),
+        sa.Column("uploaded_by", sa.VARCHAR(), autoincrement=False, nullable=True),
         sa.ForeignKeyConstraint(
             ["resident_id"],
             ["residents.id"],

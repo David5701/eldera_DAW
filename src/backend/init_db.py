@@ -1,4 +1,3 @@
-
 import auth
 import models
 from database import SessionLocal, engine
@@ -8,7 +7,6 @@ from sqlalchemy import text
 def init_db():
     db = SessionLocal()
     try:
-
         # 0. Habilitar extensiones de PostgreSQL
         print("Habilitando extensiones de PostgreSQL (unaccent)...")
         try:
@@ -22,10 +20,11 @@ def init_db():
         # 0.1 Sincronización de esquema (Asegurar columnas nuevas tras actualizaciones de modelos)
         print("Verificando integridad del esquema de base de datos...")
         from sqlalchemy import inspect
+
         inspector = inspect(engine)
         if "residents" in inspector.get_table_names():
-            columns = [col['name'] for col in inspector.get_columns('residents')]
-            
+            columns = [col["name"] for col in inspector.get_columns("residents")]
+
             # Listado de columnas críticas añadidas recientemente
             required_cols = [
                 ("surgical_history", "TEXT"),
@@ -41,9 +40,9 @@ def init_db():
                 ("family_contacts", "JSON"),
                 ("sleep_medication", "VARCHAR"),
                 ("sleep_pattern", "VARCHAR"),
-                ("sleep_observations", "TEXT")
+                ("sleep_observations", "TEXT"),
             ]
-            
+
             for col_name, col_type in required_cols:
                 if col_name not in columns:
                     print(f"   🔧 Añadiendo columna faltante: {col_name}...")
@@ -54,7 +53,6 @@ def init_db():
                     except Exception as col_err:
                         print(f"   ⚠️ Error al añadir {col_name}: {col_err}")
                         db.rollback()
-        
 
         # 1. Asegurar que existe la Residencia 1 (DEPENDENCIA CRÍTICA)
         residence = db.query(models.Residence).filter(models.Residence.id == 1).first()
@@ -64,18 +62,14 @@ def init_db():
                 id=1,
                 name="Residencia Eldera Demo",
                 cif="DEMO12345",
-                plan="pro"
+                plan="pro",
             )
             db.add(residence)
             db.commit()
             print("✅ Residencia por defecto creada.")
 
         # 2. Verificar/Crear Usuario Administrador
-        user = (
-            db.query(models.User)
-            .filter(models.User.username == "admin")
-            .first()
-        )
+        user = db.query(models.User).filter(models.User.username == "admin").first()
         if not user:
             print("Creando usuario administrador...")
             hashed_password = auth.get_password_hash("admin123")
@@ -83,7 +77,7 @@ def init_db():
                 username="admin",
                 hashed_password=hashed_password,
                 role="admin",
-                residence_id=1, # Vinculado a la residencia por defecto
+                residence_id=1,  # Vinculado a la residencia por defecto
                 is_active=True,
             )
             db.add(admin_user)
@@ -102,11 +96,7 @@ def init_db():
         ]
 
         for username, password, role in test_users_data:
-            existing_user = (
-                db.query(models.User)
-                .filter(models.User.username == username)
-                .first()
-            )
+            existing_user = db.query(models.User).filter(models.User.username == username).first()
             if not existing_user:
                 print(f"Creando usuario {role} '{username}'...")
                 hashed_password = auth.get_password_hash(password)
@@ -123,8 +113,8 @@ def init_db():
                 if not existing_user.hashed_password.startswith("$2b$"):
                     print(f"⚠️ Migrando contraseña de {username} ({role}) a bcrypt...")
                     existing_user.hashed_password = auth.get_password_hash(password)
-                    existing_user.role = role # Asegurar que el rol es el correcto
-        
+                    existing_user.role = role  # Asegurar que el rol es el correcto
+
         db.commit()
         print("✅ Usuarios de prueba sincronizados y migrados a bcrypt.")
 
@@ -134,17 +124,26 @@ def init_db():
             print("Poblando residentes iniciales con seed_test_data...")
             try:
                 from seed_test_data import seed
+
                 seed()
                 print("✅ seed_test_data completado.")
             except Exception as seed_err:
                 print(f"⚠️  seed_test_data falló (no crítico): {seed_err}")
 
-        # MIGRACIÓN: Asegurar que todos los residentes tienen una residencia asignada (ID=1 por defecto)
+        # MIGRACIÓN: Asegurar que todos los residentes tienen una residencia asignada
+        # (ID=1 por defecto).
         # Esto es crítico para que nuevos roles como psicólogo puedan ver los datos previos.
-        residents_without_residence = db.query(models.Resident).filter(models.Resident.residence_id == None).count()
+        residents_without_residence = (
+            db.query(models.Resident).filter(models.Resident.residence_id is None).count()
+        )
         if residents_without_residence > 0:
-            print(f"🔧 Migrando {residents_without_residence} residentes sin ID de residencia a ID=1...")
-            db.query(models.Resident).filter(models.Resident.residence_id == None).update({models.Resident.residence_id: 1})
+            print(
+                f"🔧 Migrando {residents_without_residence} residentes "
+                f"sin ID de residencia a ID=1..."
+            )
+            db.query(models.Resident).filter(models.Resident.residence_id is None).update(
+                {models.Resident.residence_id: 1}
+            )
             db.commit()
             print("✅ Residentes migrados correctamente.")
 
@@ -161,9 +160,7 @@ def init_db():
                 clean_num = "".join(nums)
                 # Si la extracción funcionó y es distinta, actualizar
                 if clean_num and clean_num != r.emergency_contact:
-                    print(
-                        f"   Sanitizando ID {r.id}: '{r.emergency_contact}' -> '{clean_num}'"
-                    )
+                    print(f"   Sanitizando ID {r.id}: '{r.emergency_contact}' -> '{clean_num}'")
                     r.emergency_contact = clean_num
                     count += 1
         if count > 0:
@@ -176,7 +173,6 @@ def init_db():
         print(f"Error inicializando la base de datos: {e}")
     finally:
         db.close()
-
 
 
 if __name__ == "__main__":

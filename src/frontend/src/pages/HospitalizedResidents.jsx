@@ -31,7 +31,7 @@ export default function HospitalizedResidents() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Filters
+    // Filtros
     const [showHistory, setShowHistory] = useState(false);
     const [dateRange, setDateRange] = useState({ start: '', end: '' });
 
@@ -43,7 +43,7 @@ export default function HospitalizedResidents() {
         let events = [];
 
         residents.forEach(r => {
-            // 1. Current Active Hospitalization
+            // 1. Hospitalización activa actual
             if (r.status === 'hospitalized') {
                 events.push({
                     type: 'active',
@@ -56,7 +56,7 @@ export default function HospitalizedResidents() {
                 });
             }
 
-            // 2. Historical Hospitalizations (Only if toggle ON)
+            // 2. Historial de hospitalizaciones (solo si el toggle está activado)
             if (showHistory && r.hospitalization_history && Array.isArray(r.hospitalization_history)) {
                 r.hospitalization_history.forEach(h => {
                     events.push({
@@ -72,7 +72,7 @@ export default function HospitalizedResidents() {
             }
         });
 
-        // Filter by Search Term
+        // Filtrar por término de búsqueda
         if (searchTerm) {
             const lowerTerm = searchTerm.toLowerCase();
             events = events.filter(e =>
@@ -83,7 +83,7 @@ export default function HospitalizedResidents() {
             );
         }
 
-        // Filter by Date Range
+        // Filtrar por rango de fechas
         if (dateRange.start && dateRange.end) {
             const start = new Date(dateRange.start);
             const end = new Date(dateRange.end);
@@ -94,7 +94,7 @@ export default function HospitalizedResidents() {
             });
         }
 
-        // Sort by Date (Newest First)
+        // Ordenar por fecha (más recientes primero)
         events.sort((a, b) => {
             const dateA = a.startDate ? new Date(a.startDate) : new Date(0);
             const dateB = b.startDate ? new Date(b.startDate) : new Date(0);
@@ -107,15 +107,15 @@ export default function HospitalizedResidents() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            // Fetch all residents (max allowed is 100 per page)
-            // Ideally we should loop pages, but for now we fetch max page size
+            // Obtenemos todos los residentes (máximo permitido: 100 por página)
+            // Lo ideal sería paginar, pero por ahora obtenemos el tamaño máximo de página
             const response = await api.get('/residents/?size=100&source=hospitalized_management');
 
-            // Handle pagination structure
+            // Gestionar la estructura paginada de la respuesta
             let allResidents = response.data.items || (Array.isArray(response.data) ? response.data : []);
 
-            // If total > 100, we might need to fetch more pages. 
-            // For this quick fix, if we see total > 100, we fetch page 2 to ensure we catch everyone (up to 200).
+            // Si el total supera 100, necesitamos cargar más páginas.
+            // Solución rápida: si total > 100, cargamos la página 2 para cubrir hasta 200 residentes.
             if (response.data.total && response.data.total > 100) {
                 const response2 = await api.get('/residents/?size=100&page=2');
                 const items2 = response2.data.items || [];

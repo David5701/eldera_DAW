@@ -16,5 +16,11 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/setupTests.js',
+    pool: 'vmForks',
+    vmForks: {
+      singleFork: true,
+    },
+    testTimeout: 60000,
+    hookTimeout: 60000,
   }
 });

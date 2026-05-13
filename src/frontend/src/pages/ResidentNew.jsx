@@ -27,7 +27,7 @@ export default function ResidentNew() {
 
     return (
         <DashboardLayout>
-            <div className="flex flex-col gap-8 pb-20 pt-2 md:pt-0">
+            <div className="flex flex-col gap-8 pb-20">
                 <ResidentFormExtended
                     onSubmit={handleSubmit}
                     onCancel={handleCancel}

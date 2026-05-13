@@ -35,7 +35,26 @@ const ResidentsPage = () => {
     };
 
     const [searchQuery, setSearchQuery] = useState('');
-    const statusFilter = searchParams.get('status') || 'active';
+    
+    // PERSISTENCE: Check sessionStorage if param is missing
+    const statusFilter = searchParams.get('status') || sessionStorage.getItem('lastResidentStatusFilter') || 'active';
+    
+    // Ensure URL matches the persisted/default status if it was missing
+    useEffect(() => {
+        if (!searchParams.get('status')) {
+            const newParams = new URLSearchParams(searchParams);
+            newParams.set('status', statusFilter);
+            setSearchParams(newParams, { replace: true });
+        }
+    }, [searchParams, statusFilter, setSearchParams]);
+
+    // Save to sessionStorage when it changes via URL
+    useEffect(() => {
+        const currentStatus = searchParams.get('status');
+        if (currentStatus) {
+            sessionStorage.setItem('lastResidentStatusFilter', currentStatus);
+        }
+    }, [searchParams]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -217,7 +236,7 @@ const ResidentsPage = () => {
                 }
             `}</style>
             
-            <div className="p-4 md:p-8">
+            <div className="px-4 pb-4 md:px-8 md:pb-8">
 
                 {/* Mobile Controls */}
                 <div className="md:hidden mb-6">

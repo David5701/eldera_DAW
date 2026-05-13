@@ -98,12 +98,22 @@ const TRANSLATIONS = {
     'pant': 'Bragapañal',
     
     // Deterioro y Escalas
-    'none': 'Sin deterioro',
-    'mild': 'Leve',
-    'moderate': 'Moderado',
-    'severe': 'Grave',
+    'mild': 'Deterioro leve (GDS 3)',
+    'moderate': 'Deterioro moderado (GDS 4)',
+    'severe': 'Deterioro grave (GDS 6)',
+    'very_mild': 'Deterioro muy leve (GDS 2)',
+    'moderate_severe': 'Deterioro moderadamente severo (GDS 5)',
+    'very_severe': 'Deterioro muy severo (GDS 7)',
+    'none': 'Sin deterioro (GDS 1)',
     'specialist': 'Especialista',
     'urgency': 'Urgencias',
+    'time': 'Temporal',
+    'space': 'Espacial',
+    'person': 'Personal',
+    'all': 'Global',
+    'left': 'Izquierdo',
+    'right': 'Derecho',
+    'both': 'Ambos',
 
     // Booleans y Genéricos
     'true': 'Sí',
@@ -163,6 +173,9 @@ const TRANSLATIONS = {
     'F': 'Femenino',
     'ss': 'Seguridad Social',
     'private': 'Privado',
+    'right': 'Derecho',
+    'left': 'Izquierdo',
+    'both': 'Ambos',
 };
 
 const EDIT_TAB_MAP = {
@@ -848,7 +861,14 @@ function EliminationDetail({ resident }) {
                     <div className="space-y-3">
                         <InfoRow label="Incontinencia" value={t(resident.urinary_incontinence)} />
                         {resident.urinary_incontinence && (
-                            <InfoRow label="Tipo" value={t(resident.incontinence_type)} />
+                            <>
+                                <InfoRow label="Frecuencia" value={
+                                    resident.urinary_incontinence_frequency?.toString() === '1' ? 'Ocasional' :
+                                    resident.urinary_incontinence_frequency?.toString() === '2' ? 'Frecuente' :
+                                    resident.urinary_incontinence_frequency?.toString() === '3' ? 'Total' : resident.urinary_incontinence_frequency || '--'
+                                } />
+                                <InfoRow label="Tipo" value={t(resident.incontinence_type)} />
+                            </>
                         )}
                         
                         {/* Only show devices/extra if active/true */}
@@ -1061,7 +1081,7 @@ function PhysioDetail({ resident }) {
                             label="Riesgo UPP (Norton)"
                             value={
                                 resident.norton_score ? (
-                                    <span className={`px-3 py-1 rounded-full font-black text-xs border ${resident.norton_score <= 12 ? 'bg-rose-100 text-rose-800 border-rose-200' :
+                                    <span className={`inline-flex items-center justify-center px-3 py-1 rounded-lg font-black text-[10px] sm:text-xs border text-center leading-tight whitespace-nowrap ${resident.norton_score <= 12 ? 'bg-rose-100 text-rose-800 border-rose-200' :
                                         resident.norton_score <= 14 ? 'bg-amber-100 text-amber-800 border-amber-200' :
                                             'bg-emerald-100 text-emerald-800 border-emerald-200'
                                         }`}>
@@ -1131,17 +1151,43 @@ function PhysioDetail({ resident }) {
                     <h3 className="font-bold text-rose-900 mb-4 flex items-center gap-2">
                         <Activity className="w-5 h-5" /> Dispositivos Invasivos
                     </h3>
-                    <div className="space-y-3">
-                        <InfoRow label="PEG / Gastrostomía" value={t(resident.device_peg)} />
-                        <InfoRow label="Sonda Nasogástrica" value={t(resident.device_nasogastric)} />
-                        <InfoRow label="Traqueostomía" value={t(resident.device_tracheostomy)} />
-                        <InfoRow label="VEIS (Subcutánea)" value={t(resident.device_veis)} />
-                        {resident.device_invasive_change_date && (
-                            <div className="mt-3 p-3 bg-white rounded-xl border border-rose-200">
-                                <p className="text-[10px] font-black text-rose-800 uppercase mb-1">Próximo Cambio / Revisión</p>
-                                <p className="text-sm font-bold text-slate-700">{new Date(resident.device_invasive_change_date).toLocaleDateString()}</p>
-                                {resident.device_invasive_type && <p className="text-xs text-slate-500 mt-1">{resident.device_invasive_type}</p>}
-                            </div>
+                    <div className="space-y-4">
+                        {[
+                            { key: 'device_nasogastric', label: 'Sonda Nasogástrica' },
+                            { key: 'device_veis', label: 'VEIS (Subcutánea)' },
+                            { key: 'device_catheter', label: 'Sonda Vesical' },
+                            { key: 'device_peg', label: 'PEG (Gastrostomía)' },
+                            { key: 'device_tracheostomy', label: 'Traqueostomía' }
+                        ].map(({ key, label }) => {
+                            const isActive = resident[key];
+                            if (!isActive) return null;
+                            
+                            const type = resident[`${key}_type`];
+                            const date = resident[`${key}_date`];
+                            
+                            return (
+                                <div key={key} className="p-3 bg-white rounded-xl border border-rose-200 shadow-sm">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <span className="font-bold text-rose-900 text-sm">{label}</span>
+                                        <span className="px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-black rounded-full uppercase">Activo</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <p className="text-[9px] font-black text-slate-400 uppercase">Detalle</p>
+                                            <p className="text-xs font-medium text-slate-700">{type || 'Sin especificar'}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[9px] font-black text-slate-400 uppercase">Último Cambio</p>
+                                            <p className="text-xs font-medium text-slate-700">
+                                                {date ? new Date(date).toLocaleDateString() : 'Sin fecha'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {!resident.device_nasogastric && !resident.device_veis && !resident.device_catheter && !resident.device_peg && !resident.device_tracheostomy && (
+                            <p className="text-sm text-slate-500 italic text-center py-4">No se registran dispositivos invasivos</p>
                         )}
                     </div>
                 </div>
@@ -1454,7 +1500,7 @@ function PsychDetail({ resident }) {
                     <h3 className="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
                         <AlertCircle className="w-5 h-5 text-rose-500" /> Perfil Conductual
                     </h3>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 mb-4">
                         {resident.behavior_agitation && <span className="px-3 py-1 bg-rose-50 text-rose-700 rounded-full text-xs font-bold">Agitación</span>}
                         {resident.behavior_aggression && <span className="px-3 py-1 bg-rose-50 text-rose-700 rounded-full text-xs font-bold">Agresividad</span>}
                         {resident.behavior_disorientation && <span className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-bold">Desorientación</span>}
@@ -1462,6 +1508,28 @@ function PsychDetail({ resident }) {
                         {!hasBehaviors &&
                             <span className="text-slate-400 italic text-sm">Sin alteraciones conductuales registradas.</span>
                         }
+                    </div>
+
+                    {/* Observaciones detalladas */}
+                    <div className="space-y-3">
+                        {resident.behavior_agitation && resident.behavior_agitation_frequency && (
+                            <div className="p-3 bg-white rounded-xl border border-rose-100 shadow-sm">
+                                <p className="text-[10px] font-black text-rose-600 uppercase mb-1">Detalle Agitación</p>
+                                <p className="text-sm text-slate-700 font-medium italic">{resident.behavior_agitation_frequency}</p>
+                            </div>
+                        )}
+                        {resident.behavior_aggression && resident.behavior_aggression_type && (
+                            <div className="p-3 bg-white rounded-xl border border-rose-100 shadow-sm">
+                                <p className="text-[10px] font-black text-rose-600 uppercase mb-1">Detalle Agresividad</p>
+                                <p className="text-sm text-slate-700 font-medium italic">{resident.behavior_aggression_type}</p>
+                            </div>
+                        )}
+                        {resident.behavior_disorientation && resident.behavior_disorientation_type && (
+                            <div className="p-3 bg-white rounded-xl border border-orange-100 shadow-sm">
+                                <p className="text-[10px] font-black text-orange-600 uppercase mb-1">Tipo de Desorientación</p>
+                                <p className="text-sm text-slate-700 font-bold">{t(resident.behavior_disorientation_type)}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

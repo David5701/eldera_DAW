@@ -306,10 +306,10 @@ export const nutritionBase = z.object({
 // 4. Elimination Base
 export const eliminationBase = z.object({
   urinary_incontinence: z.boolean().optional(),
-  urinary_incontinence_frequency: optionalNumber,
+  urinary_incontinence_frequency: optionalString,
   incontinence_type: optionalString,
   fecal_incontinence: z.boolean().optional(),
-  fecal_incontinence_frequency: optionalNumber,
+  fecal_incontinence_notes: optionalString,
   diaper_use: z.boolean().optional(),
   diaper_type: optionalString,
   diaper_size: optionalString,
@@ -331,6 +331,21 @@ export const mobilityBase = z.object({
   device_oxygen_type: optionalString,
   device_oxygen_flow: optionalNumber,
   device_oxygen_hours: optionalNumber,
+  device_nasogastric: z.boolean().optional(),
+  device_nasogastric_type: optionalString,
+  device_nasogastric_date: optionalDate,
+  device_veis: z.boolean().optional(),
+  device_veis_type: optionalString,
+  device_veis_date: optionalDate,
+  device_catheter: z.boolean().optional(),
+  device_catheter_type: optionalString,
+  device_catheter_date: optionalDate,
+  device_peg: z.boolean().optional(),
+  device_peg_type: optionalString,
+  device_peg_date: optionalDate,
+  device_tracheostomy: z.boolean().optional(),
+  device_tracheostomy_type: optionalString,
+  device_tracheostomy_date: optionalDate,
 });
 
 // 6. Cognitive Base

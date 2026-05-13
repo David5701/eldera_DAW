@@ -1,6 +1,6 @@
-// Helper to resolve backend static URLs
-// Backend returns paths like "/static/photos/2/image.jpg"
-// We need to convert them to full URLs like "http://hostname:8001/static/..."
+// Función auxiliar para resolver URLs estáticas del backend.
+// El backend devuelve rutas como "/static/photos/2/image.jpg"
+// Necesitamos convertirlas a URLs completas como "http://hostname:8085/static/..."
 
 export const getBackendUrl = () => {
     // Detección dinámica para desarrollo local (PC y móvil en LAN)
@@ -21,22 +21,22 @@ export const getBackendUrl = () => {
         return import.meta.env.VITE_API_URL;
     }
 
-    return 'https://eldera-api.onrender.com';
+    return 'https://eldera-api-daw.onrender.com';
 };
 
 export const resolveStaticUrl = (path) => {
     if (!path) return null;
     
-    // If already a full URL, return as-is
+    // Si ya es una URL completa, devolverla tal cual
     if (path.startsWith('http://') || path.startsWith('https://')) {
         return path;
     }
     
-    // If it's a relative path starting with /static, prepend backend URL
+    // Si es una ruta relativa que empieza por /static, añadir la URL del backend
     if (path.startsWith('/static')) {
         return `${getBackendUrl()}${path}`;
     }
     
-    // Otherwise return as-is (for ui-avatars, etc)
+    // En cualquier otro caso, devolver tal cual (para ui-avatars, etc.)
     return path;
 };

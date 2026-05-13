@@ -56,7 +56,7 @@ async def get_current_user(
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="No se pudieron validar las credenciales",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -67,11 +67,7 @@ async def get_current_user(
         token_data = schemas.TokenData(username=username)
     except jwt.PyJWTError as err:
         raise credentials_exception from err
-    user = (
-        db.query(models.User)
-        .filter(models.User.username == token_data.username)
-        .first()
-    )
+    user = db.query(models.User).filter(models.User.username == token_data.username).first()
     if user is None:
         raise credentials_exception
     return user
@@ -81,5 +77,5 @@ async def get_current_active_user(
     current_user: models.User = Depends(get_current_user),
 ):
     if not current_user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
+        raise HTTPException(status_code=400, detail="Usuario inactivo")
     return current_user

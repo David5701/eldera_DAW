@@ -61,7 +61,7 @@ export default function DeceasedResidents() {
         );
     }
 
-    // Sort by Date (Newest First)
+    // Ordenar por fecha (más recientes primero)
     filteredResidents.sort((a, b) => {
         const dateA = a.inactive_date ? new Date(a.inactive_date) : new Date(0);
         const dateB = b.inactive_date ? new Date(b.inactive_date) : new Date(0);

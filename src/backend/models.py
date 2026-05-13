@@ -49,9 +49,7 @@ class Resident(Base):
     profile_photo = Column(String, nullable=True)  # URL o ruta a la imagen
     date_of_birth = Column(Date)
     dni_nie = Column(String, nullable=True)
-    document_type = Column(
-        String, default="DNI_NIE"
-    )  # 'DNI_NIE', 'PASSPORT', 'OTHER'
+    document_type = Column(String, default="DNI_NIE")  # 'DNI_NIE', 'PASSPORT', 'OTHER'
 
     # === DATOS PERSONALES EXPANDIDOS ===
     sex = Column(String, nullable=True)  # 'M', 'F', 'O'
@@ -164,13 +162,27 @@ class Resident(Base):
 
     # Sondas y dispositivos médicos
     device_nasogastric = Column(Boolean, default=False)
+    device_nasogastric_type = Column(String, nullable=True)
+    device_nasogastric_date = Column(Date, nullable=True)
+
     device_veis = Column(Boolean, default=False)
+    device_veis_type = Column(String, nullable=True)
+    device_veis_date = Column(Date, nullable=True)
+
     device_catheter = Column(Boolean, default=False)
+    device_catheter_type = Column(String, nullable=True)
+    device_catheter_date = Column(Date, nullable=True)
+
     device_peg = Column(Boolean, default=False)
+    device_peg_type = Column(String, nullable=True)
+    device_peg_date = Column(Date, nullable=True)
+
     device_tracheostomy = Column(Boolean, default=False)
-    device_invasive_type = Column(String, nullable=True)  # Tipo específico
-    # Fecha último cambio
-    device_invasive_change_date = Column(Date, nullable=True)
+    device_tracheostomy_type = Column(String, nullable=True)
+    device_tracheostomy_date = Column(Date, nullable=True)
+
+    device_invasive_type = Column(String, nullable=True)  # Legacy
+    device_invasive_change_date = Column(Date, nullable=True)  # Legacy
 
     # === NUTRICIÓN Y DIETA ===
     # 'normal', 'soft', 'pureed', 'liquid', 'low_salt', 'diabetic', etc.
@@ -193,7 +205,7 @@ class Resident(Base):
     height = Column(Float(), nullable=True)  # cm
     bmi = Column(Float(), nullable=True)
     supplementation_type = Column(String, nullable=True)  # 'enteral', 'oral'
-    # Checkboxes for properties
+    # Casillas de verificación para propiedades adicionales
     supplement_hchp = Column(Boolean, default=False)
     supplement_diabetes = Column(Boolean, default=False)
     supplement_renal = Column(Boolean, default=False)
@@ -203,6 +215,9 @@ class Resident(Base):
 
     # === HIGIENE Y CONTINENCIA ===
     urinary_incontinence = Column(Boolean, default=False, index=True)
+    urinary_incontinence_frequency = Column(
+        String, nullable=True
+    )  # '1', '2', '3' (ocasional, frecuente, total)
     fecal_incontinence = Column(Boolean, default=False, index=True)
     fecal_incontinence_notes = Column(Text, nullable=True)
     # 'esfuerzo', 'urgencia', etc.
@@ -250,9 +265,7 @@ class Resident(Base):
     vaccine_covid_batch = Column(String, nullable=True)
 
     # === HERIDAS Y CUIDADOS ===
-    wounds = Column(
-        JSON_TYPE, default=list
-    )  # [{type, location, grade, cure, frequency}]
+    wounds = Column(JSON_TYPE, default=list)  # [{type, location, grade, cure, frequency}]
     norton_score = Column(Integer, nullable=True)  # Riesgo UPP (Norton)
     has_pressure_ulcers = Column(Boolean, default=False, index=True)
     upp_grade = Column(String, nullable=True)  # Grado UPP
@@ -333,9 +346,7 @@ class Resident(Base):
 
     # === METADATOS ===
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class User(Base):
@@ -354,5 +365,3 @@ class User(Base):
     role = Column(String)  # 'admin', 'nurse', 'aux'
     is_active = Column(Boolean, default=True)
     supabase_uid = Column(UUID(as_uuid=True), unique=True, nullable=True)
-
-

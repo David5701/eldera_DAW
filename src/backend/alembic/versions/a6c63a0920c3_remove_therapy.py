@@ -67,22 +67,12 @@ def downgrade() -> None:
     op.create_table(
         "resident_therapies",
         sa.Column("id", sa.INTEGER(), autoincrement=True, nullable=False),
-        sa.Column(
-            "resident_id", sa.INTEGER(), autoincrement=False, nullable=True
-        ),
-        sa.Column(
-            "therapy_type", sa.VARCHAR(), autoincrement=False, nullable=True
-        ),
-        sa.Column(
-            "frequency", sa.VARCHAR(), autoincrement=False, nullable=True
-        ),
+        sa.Column("resident_id", sa.INTEGER(), autoincrement=False, nullable=True),
+        sa.Column("therapy_type", sa.VARCHAR(), autoincrement=False, nullable=True),
+        sa.Column("frequency", sa.VARCHAR(), autoincrement=False, nullable=True),
         sa.Column("objective", sa.TEXT(), autoincrement=False, nullable=True),
-        sa.Column(
-            "diagnosis", sa.VARCHAR(), autoincrement=False, nullable=True
-        ),
-        sa.Column(
-            "therapist_name", sa.VARCHAR(), autoincrement=False, nullable=True
-        ),
+        sa.Column("diagnosis", sa.VARCHAR(), autoincrement=False, nullable=True),
+        sa.Column("therapist_name", sa.VARCHAR(), autoincrement=False, nullable=True),
         sa.Column("active", sa.BOOLEAN(), autoincrement=False, nullable=True),
         sa.Column("start_date", sa.DATE(), autoincrement=False, nullable=True),
         sa.Column("end_date", sa.DATE(), autoincrement=False, nullable=True),

@@ -48,9 +48,7 @@ def upgrade() -> None:
         if col_name not in columns:
             print(f"Adding missing column: {col_name}")
             default_clause = f"DEFAULT {default_val}" if default_val else ""
-            op.execute(
-                f"ALTER TABLE residents ADD COLUMN {col_name} {col_type} {default_clause}"
-            )
+            op.execute(f"ALTER TABLE residents ADD COLUMN {col_name} {col_type} {default_clause}")
 
 
 def downgrade() -> None:

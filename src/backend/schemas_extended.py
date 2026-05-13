@@ -1,6 +1,6 @@
 import re
-from datetime import date, datetime, time, timedelta
-from typing import Any, Dict, List, Literal, Optional
+from datetime import date, datetime, time
+from typing import Any, Literal, Optional
 
 from pydantic import (
     BaseModel,
@@ -14,15 +14,17 @@ from pydantic import (
 # SCHEMAS EXTENDIDOS DE RESIDENTES
 # ============================================================================
 
+
 class ResidentValidatorMixin:
     """Mixin para validaciones comunes entre schemas de residentes"""
 
     @model_validator(mode="before")
     @classmethod
     def sanitize_empty_strings(cls, data: Any) -> Any:
-        """Convierte strings vacíos, 'null' o 'None' a None para evitar errores de validación de tipo."""
+        """Convierte strings vacíos, 'null' o 'None' a None para evitar errores
+        de validación de tipo."""
         bad_values = ["", "null", "None", "NULL", "none", "undefined"]
-        
+
         if isinstance(data, dict):
             new_data = data.copy()
             for key, value in new_data.items():
@@ -32,7 +34,8 @@ class ResidentValidatorMixin:
         elif hasattr(data, "__dict__"):
             sanitized = {}
             for key, value in data.__dict__.items():
-                if key.startswith('_'): continue
+                if key.startswith("_"):
+                    continue
                 if isinstance(value, str) and value.strip() in bad_values:
                     sanitized[key] = None
                 else:
@@ -41,14 +44,14 @@ class ResidentValidatorMixin:
         return data
 
     @field_validator(
-        "admission_date", 
-        "date_of_birth", 
-        "inactive_date", 
-        "return_date", 
-        "hospitalization_date", 
-        "hospitalization_end_date", 
-        mode="after", 
-        check_fields=False
+        "admission_date",
+        "date_of_birth",
+        "inactive_date",
+        "return_date",
+        "hospitalization_date",
+        "hospitalization_end_date",
+        mode="after",
+        check_fields=False,
     )
     @classmethod
     def validate_dates_lenient(cls, v: Any) -> Any:
@@ -63,7 +66,7 @@ class ResidentValidatorMixin:
         # Loosen regex to allow common name characters and avoid crashing on existing data
         if not re.match(r"^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-\.\,\(\)ªº]+$", v):
             # field_name = "Nombre" if info.field_name == "name" else "Apellidos"
-            pass 
+            pass
         return v
 
     @field_validator("room_number", mode="after", check_fields=False)
@@ -99,9 +102,7 @@ class ResidentValidatorMixin:
 
     @field_validator("dni_nie", check_fields=False)
     @classmethod
-    def validate_document_content(
-        cls, v: Optional[str], info: Any
-    ) -> Optional[str]:
+    def validate_document_content(cls, v: Optional[str], info: Any) -> Optional[str]:
         """Valida formato DNI/NIE (checksum) y Pasaporte (longitud/caracteres)"""
         if not v or v.strip() == "":
             return None
@@ -109,9 +110,7 @@ class ResidentValidatorMixin:
         v = v.upper().strip()
 
         # Validar DNI/NIE Cheksum solo si PARECE un DNI/NIE (8 nums + letra o XYZ...)
-        if re.match(r"^[0-9]{8}[A-Z]$", v) or re.match(
-            r"^[XYZ][0-9]{7}[A-Z]$", v
-        ):
+        if re.match(r"^[0-9]{8}[A-Z]$", v) or re.match(r"^[XYZ][0-9]{7}[A-Z]$", v):
             # Algoritmo Letra
             nie_map = {"X": "0", "Y": "1", "Z": "2"}
 
@@ -130,19 +129,18 @@ class ResidentValidatorMixin:
 
                 if letter != expected_letter:
                     raise ValueError(
-                        f"La letra '{letter}' no es válida para el número {number_part}. Debería ser '{expected_letter}'."
+                        f"La letra '{letter}' no es válida para el número {number_part}. "
+                        f"Debería ser '{expected_letter}'."
                     )
             except ValueError as e:
                 # Re-lanzar si es error de letra, o lanzar error de formato si int() falló
                 if "Debería ser" in str(e):
                     raise e
-                raise ValueError(f"Formato de número de documento inválido: {v}")
+                raise ValueError(f"Formato de número de documento inválido: {v}") from e
 
         # Pasaporte genérico o Otros
         if not re.match(r"^[A-Z0-9]{6,20}$", v):
-            raise ValueError(
-                "El documento debe tener entre 6 y 20 caracteres alfanuméricos"
-            )
+            raise ValueError("El documento debe tener entre 6 y 20 caracteres alfanuméricos")
 
         return v
 
@@ -151,7 +149,8 @@ class ResidentValidatorMixin:
     def validate_phones(cls, v: Optional[str]) -> Optional[str]:
         if not v or v.strip() == "":
             return None
-        # Clean spaces, dashes and dots but don't enforce 9 digits or starting number for legacy data support
+        # Clean spaces, dashes and dots but don't enforce 9 digits
+        # or starting number for legacy data support
         return re.sub(r"[\s\-\.]", "", v)
 
     @field_validator("email", mode="after", check_fields=False)
@@ -179,12 +178,11 @@ class ResidentValidatorMixin:
         return self
 
 
-
-
 class ResidentBaseExtended(BaseModel, ResidentValidatorMixin):
     """Schema base extendido con todos los campos del residente (Lenient for reading)"""
 
-    # Campos básicos (hechos opcionales para evitar errores 500 en lecturas con datos antiguos/sucios)
+    # Campos básicos (hechos opcionales para evitar errores 500
+    # en lecturas con datos antiguos/sucios)
     name: str = Field("Residente", min_length=1, max_length=100)
     surname: str = Field("Sin Apellidos", min_length=1, max_length=100)
     profile_photo: Optional[str] = None
@@ -205,18 +203,14 @@ class ResidentBaseExtended(BaseModel, ResidentValidatorMixin):
     municipality: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
-    family_contacts: Optional[list[dict[str, str]]] = (
-        None  # Lista de contactos adicionales
-    )
+    family_contacts: Optional[list[dict[str, str]]] = None  # Lista de contactos adicionales
 
     # Datos de ingreso
     admission_date: Optional[date] = None
     admission_time: Optional[time] = None
 
     # Sistema de bajas
-    status: Literal["active", "inactive", "deceased", "hospitalized"] = (
-        "active"
-    )
+    status: Literal["active", "inactive", "deceased", "hospitalized"] = "active"
     inactive_date: Optional[date] = None
     inactive_reason: Optional[str] = None
     return_date: Optional[date] = None
@@ -231,7 +225,7 @@ class ResidentBaseExtended(BaseModel, ResidentValidatorMixin):
     # hospitalization_notes removed
 
     # Historial de Hospitalizaciones
-    hospitalization_history: Optional[List[Dict[str, Any]]] = []
+    hospitalization_history: Optional[list[dict[str, Any]]] = []
 
     # Datos médicos
     primary_doctor: Optional[str] = None
@@ -303,14 +297,22 @@ class ResidentBaseExtended(BaseModel, ResidentValidatorMixin):
     device_oxygen_flow: Optional[float] = None
     device_oxygen_hours: Optional[int] = None
     device_nasogastric: Optional[bool] = False
+    device_nasogastric_type: Optional[str] = None
+    device_nasogastric_date: Optional[date] = None
     device_veis: Optional[bool] = False
+    device_veis_type: Optional[str] = None
+    device_veis_date: Optional[date] = None
     device_catheter: Optional[bool] = False
+    device_catheter_type: Optional[str] = None
+    device_catheter_date: Optional[date] = None
     device_peg: Optional[bool] = False
+    device_peg_type: Optional[str] = None
+    device_peg_date: Optional[date] = None
     device_tracheostomy: Optional[bool] = False
+    device_tracheostomy_type: Optional[str] = None
+    device_tracheostomy_date: Optional[date] = None
     device_invasive_type: Optional[str] = None
     device_invasive_change_date: Optional[date] = None
-
-
 
     # Nutrición
     diet_normal: bool = False
@@ -337,6 +339,7 @@ class ResidentBaseExtended(BaseModel, ResidentValidatorMixin):
 
     # Higiene y continencia
     urinary_incontinence: bool = False
+    urinary_incontinence_frequency: Optional[str] = None
     fecal_incontinence: bool = False
     fecal_incontinence_notes: Optional[str] = None
     incontinence_type: Optional[str] = None
@@ -379,7 +382,7 @@ class ResidentBaseExtended(BaseModel, ResidentValidatorMixin):
     vaccine_covid_batch: Optional[str] = None
 
     # Heridas y cuidados
-    wounds: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
+    wounds: Optional[list[dict[str, Any]]] = Field(default_factory=list)
     has_pressure_ulcers: bool = False
     upp_grade: Optional[str] = None
     upp_cure_type: Optional[str] = None
@@ -446,7 +449,7 @@ class ResidentCreateExtended(ResidentBaseExtended, ResidentValidatorMixin):
 
 class ResidentExtended(ResidentBaseExtended):
     """Schema completo de residente incluyendo ID y metadatos.
-    
+
     Los validadores estrictos (DNI, teléfono, email, código postal) se
     desactivan en este schema de LECTURA para no rechazar datos ya
     existentes en la base de datos. La validación sigue activa en los
@@ -526,7 +529,7 @@ class ResidentUpdateExtended(BaseModel, ResidentValidatorMixin):
     hospitalization_end_date: Optional[date] = None
     hospitalization_hospital: Optional[str] = None
     hospitalization_reason: Optional[str] = None
-    hospitalization_history: Optional[List[Dict[str, Any]]] = None
+    hospitalization_history: Optional[list[dict[str, Any]]] = None
 
     # Medical fields
     primary_doctor: Optional[str] = None
@@ -589,10 +592,20 @@ class ResidentUpdateExtended(BaseModel, ResidentValidatorMixin):
     device_oxygen_flow: Optional[float] = None
     device_oxygen_hours: Optional[int] = None
     device_nasogastric: Optional[bool] = None
+    device_nasogastric_type: Optional[str] = None
+    device_nasogastric_date: Optional[date] = None
     device_veis: Optional[bool] = None
+    device_veis_type: Optional[str] = None
+    device_veis_date: Optional[date] = None
     device_catheter: Optional[bool] = None
+    device_catheter_type: Optional[str] = None
+    device_catheter_date: Optional[date] = None
     device_peg: Optional[bool] = None
+    device_peg_type: Optional[str] = None
+    device_peg_date: Optional[date] = None
     device_tracheostomy: Optional[bool] = None
+    device_tracheostomy_type: Optional[str] = None
+    device_tracheostomy_date: Optional[date] = None
     device_invasive_type: Optional[str] = None
     device_invasive_change_date: Optional[date] = None
 
@@ -622,6 +635,7 @@ class ResidentUpdateExtended(BaseModel, ResidentValidatorMixin):
 
     # Hygiene and Elimination
     urinary_incontinence: Optional[bool] = None
+    urinary_incontinence_frequency: Optional[str] = None
     fecal_incontinence: Optional[bool] = None
     fecal_incontinence_notes: Optional[str] = None
     incontinence_type: Optional[str] = None
@@ -664,7 +678,7 @@ class ResidentUpdateExtended(BaseModel, ResidentValidatorMixin):
     vaccine_covid_batch: Optional[str] = None
 
     # Gordon Patterns and Risks
-    wounds: Optional[List[Dict[str, Any]]] = None
+    wounds: Optional[list[dict[str, Any]]] = None
     has_pressure_ulcers: Optional[bool] = None
     upp_grade: Optional[str] = None
     upp_cure_type: Optional[str] = None
@@ -895,9 +909,7 @@ class CareLog(CareLogBase):
 
 
 class ResidentVaccinationBase(BaseModel):
-    vaccine_type: str = Field(
-        ..., description="flu, pneumococcal, covid19, etc"
-    )
+    vaccine_type: str = Field(..., description="flu, pneumococcal, covid19, etc")
     vaccine_name: Optional[str] = None
     dose_number: Optional[int] = None
     administration_date: Optional[date] = None
@@ -920,5 +932,3 @@ class ResidentVaccination(ResidentVaccinationBase):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)
-
-

@@ -60,14 +60,14 @@ export default function Sidebar({ isOpen, onClose }) {
             {/* Mobile Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden print:hidden"
+                    className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] md:hidden print:hidden"
                     onClick={onClose}
                 />
             )}
 
             {/* Mobile Sidebar (Drawer) */}
             <aside className={`
-                fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-[#0F172A] border border-slate-700 rounded-r-2xl my-2 transform transition-transform duration-300 ease-in-out md:hidden print:hidden
+                fixed inset-y-0 left-0 z-[70] w-72 max-w-[80vw] bg-[#0F172A] border border-slate-700 rounded-r-2xl my-2 transform transition-transform duration-300 ease-in-out md:hidden print:hidden
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 <SidebarContent

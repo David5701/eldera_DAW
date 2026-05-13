@@ -7,11 +7,9 @@ def paginate(query, model, page: int = 1, size: int = 20):
         items = query.offset((page - 1) * size).limit(size).all()
         items_data = []
         for item in items:
-            # Manually convert to dict to avoid Pydantic from_attributes
-            # issues
-            item_dict = {
-                c.name: getattr(item, c.name) for c in item.__table__.columns
-            }
+            # Convertir manualmente a dict para evitar problemas
+            # con from_attributes de Pydantic
+            item_dict = {c.name: getattr(item, c.name) for c in item.__table__.columns}
             items_data.append(model.model_validate(item_dict))
         result = {
             "total": total,
@@ -20,7 +18,7 @@ def paginate(query, model, page: int = 1, size: int = 20):
             "pages": (total + size - 1) // size if size > 0 else 1,
             "items": items_data,
         }
-        # Force validation here to catch errors
+        # Forzar validación aquí para detectar errores antes de retornar
         return schemas_extended.ResidentPaginatedExtended(**result)
     except Exception as e:
         print(f"PAGINATION ERROR: {e}")

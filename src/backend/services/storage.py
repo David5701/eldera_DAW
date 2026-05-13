@@ -8,9 +8,7 @@ from fastapi import UploadFile
 
 class StorageService(ABC):
     @abstractmethod
-    async def save_file(
-        self, file: UploadFile, directory: str, filename: str
-    ) -> str:
+    async def save_file(self, file: UploadFile, directory: str, filename: str) -> str:
         """Guarda un archivo y retorna la URL/Ruta relativa"""
         pass
 
@@ -33,9 +31,7 @@ class LocalFileStorage(StorageService):
         # Ensure base directory exists
         self.base_dir.mkdir(parents=True, exist_ok=True)
 
-    async def save_file(
-        self, file: UploadFile, directory: str, filename: str
-    ) -> str:
+    async def save_file(self, file: UploadFile, directory: str, filename: str) -> str:
         """
         Saves file to local disk: uploads/{directory}/{filename}
         Returns: /static/{directory}/{filename} (URL friendly path)
@@ -81,6 +77,7 @@ class LocalFileStorage(StorageService):
 # Lógica de inicialización de la instancia singleton
 # En una aplicación real, esto se inyectaría según variables de entorno (S3 vs Local)
 
+
 def get_storage_service() -> StorageService:
     supabase_url = os.getenv("SUPABASE_URL")
     supabase_key = os.getenv("SUPABASE_KEY")
@@ -89,9 +86,11 @@ def get_storage_service() -> StorageService:
     if supabase_url and supabase_key:
         print(f"DEBUG: Usando Almacenamiento Supabase en {supabase_url}")
         from .storage_supabase import SupabaseStorageService
+
         return SupabaseStorageService(supabase_url, supabase_key, supabase_bucket)
-    
+
     print("DEBUG: Usando Almacenamiento de Archivos Local")
     return LocalFileStorage()
+
 
 storage_service = get_storage_service()

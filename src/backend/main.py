@@ -1,19 +1,17 @@
 import os
-from datetime import datetime
 from contextlib import asynccontextmanager
+from datetime import datetime
 from pathlib import Path
 
 # Inicialización de tablas de la base de datos
 import database
-import models
 import models_extended  # noqa: F401
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy.orm import Session
-from sqlalchemy import text
-from init_db import init_db
 from routers import auth, dashboard, residents
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 
 @asynccontextmanager
@@ -24,9 +22,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Eldera API", 
+    title="Eldera API",
     description="Backend para el Sistema de Gestión de Residencias Eldera",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Configuración de CORS robusta para desarrollo y producción
@@ -44,9 +42,7 @@ app.add_middleware(
 @app.middleware("http")
 async def add_security_headers(request, call_next):
     response = await call_next(request)
-    response.headers["Cache-Control"] = (
-        "no-store, no-cache, must-revalidate, max-age=0"
-    )
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
@@ -74,15 +70,14 @@ def health_check(db: Session = Depends(database.get_db)):
     try:
         db.execute(text("SELECT 1"))
         return {
-            "status": "ok", 
+            "status": "ok",
             "database": "connected",
-            "timestamp": datetime.utcnow()
+            "timestamp": datetime.utcnow(),
         }
     except Exception as e:
         raise HTTPException(
-            status_code=503, 
-            detail=f"Database connection failed: {str(e)}"
-        )
+            status_code=503, detail=f"Database connection failed: {str(e)}"
+        ) from e
 
 
 @app.get("/", tags=["General"])
@@ -92,6 +87,5 @@ def read_root():
         "name": "Eldera API",
         "version": "1.0.0",
         "status": "online",
-        "message": "Sistema de Gestión Integral para Residencias de Mayores"
+        "message": "Sistema de Gestión Integral para Residencias de Mayores",
     }
-

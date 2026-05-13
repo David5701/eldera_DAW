@@ -47,7 +47,7 @@ const ResidentStatusCarousel = ({ stats, navigate }) => {
             color: 'blue',
             cardLink: '/residents?view=cards&status=inactive',
             actionText: 'Ver Todos',
-            actionLink: '/residents?view=cards&status=inactive'
+            actionLink: '/inactive'
         },
         {
             title: 'Defunciones',
@@ -57,7 +57,7 @@ const ResidentStatusCarousel = ({ stats, navigate }) => {
             color: 'rose',
             cardLink: '/residents?view=cards&status=deceased',
             actionText: 'Ver Todos',
-            actionLink: '/residents?view=cards&status=deceased'
+            actionLink: '/deceased'
         },
         {
             title: 'Residentes Totales',
@@ -306,7 +306,7 @@ export default function HomePage() {
 
     return (
         <DashboardLayout headerContent={stats.residenceName ? { residenceName: stats.residenceName } : undefined}>
-            <div className="flex flex-col gap-4 md:gap-8 pb-20 pt-2 md:pt-0">
+            <div className="flex flex-col gap-4 md:gap-8 pb-20">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
                     {/* Tarjeta de Estados de Residentes (Carrusel Modular) */}
                     <ResidentStatusCarousel stats={stats} navigate={navigate} />

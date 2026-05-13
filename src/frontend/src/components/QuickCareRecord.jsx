@@ -27,7 +27,7 @@ const ALL_CATEGORIES = [
 
 const VITAL_TYPES = [
     // TA handled separately
-    // Added explicit buttonBg to avoid fragile string replacements
+    // Se usa buttonBg explícito para evitar sustituciones de strings frágiles
     { id: 'heart_rate', label: 'Frecuencia', unit: 'LPM', icon: Activity, color: 'text-indigo-600', bg: 'bg-indigo-50', buttonBg: 'bg-indigo-600', focusBorder: 'focus:border-indigo-500' },
     { id: 'temperature', label: 'Temperatura', unit: '°C', icon: Thermometer, color: 'text-orange-600', bg: 'bg-orange-50', buttonBg: 'bg-orange-600', focusBorder: 'focus:border-orange-500' },
     { id: 'glucose', label: 'Glucemia', unit: 'mg/dL', icon: Droplet, color: 'text-amber-600', bg: 'bg-amber-50', buttonBg: 'bg-amber-600', focusBorder: 'focus:border-amber-500' },

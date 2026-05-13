@@ -25,9 +25,7 @@ class ResidentBase(BaseModel):
         max_length=10,
         description="Room number (numbers only)",
     )
-    emergency_contact: str = Field(
-        ..., description="Emergency contact phone number"
-    )
+    emergency_contact: str = Field(..., description="Emergency contact phone number")
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -36,9 +34,7 @@ class ResidentBase(BaseModel):
     def validate_letters_only(cls, v: str, info) -> str:
         if not re.match(r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s-]+$", v):
             field_name = "Nombre" if info.field_name == "name" else "Apellidos"
-            raise ValueError(
-                f"{field_name} solo puede contener letras, espacios y guiones"
-            )
+            raise ValueError(f"{field_name} solo puede contener letras, espacios y guiones")
         return v
 
     @field_validator("room_number", mode="after")
@@ -53,8 +49,7 @@ class ResidentBase(BaseModel):
     def validate_phone(cls, v: str) -> str:
         if not re.match(r"^\+?[0-9\s-]{9,15}$", v):
             raise ValueError(
-                "Contacto de emergencia debe ser un número de teléfono "
-                "válido (9-15 dígitos)"
+                "Contacto de emergencia debe ser un número de teléfono válido (9-15 dígitos)"
             )
         return v
 
@@ -85,8 +80,6 @@ class ResidentPaginated(BaseModel):
     size: int
     items: list[Resident]
     model_config = ConfigDict(from_attributes=True)
-
-
 
 
 class UserBase(BaseModel):

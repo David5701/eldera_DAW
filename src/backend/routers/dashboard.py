@@ -4,7 +4,7 @@ from typing import Optional
 import schemas_extended
 from auth import get_current_user
 from database import get_db
-from fastapi import APIRouter, Depends, Request, BackgroundTasks, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from models import Residence, Resident, User
 from models_extended import (
     ResidentFollowUp,
@@ -25,7 +25,7 @@ def get_dashboard_stats(
     current_user: User = Depends(get_current_user),
     request: Request = None,
     background_tasks: BackgroundTasks = None,
-    source: Optional[str] = None
+    source: Optional[str] = None,
 ):
     """
     Obtiene estadísticas de alto nivel para el dashboard:
@@ -37,9 +37,7 @@ def get_dashboard_stats(
     """
     try:
         total_residents = (
-            db.query(Resident)
-            .filter(Resident.residence_id == current_user.residence_id)
-            .count()
+            db.query(Resident).filter(Resident.residence_id == current_user.residence_id).count()
         )
         occupancy_rate = int((total_residents / 200) * 100)
 
@@ -91,7 +89,9 @@ def get_dashboard_stats(
                     )
                 )
             except Exception as fe:
-                print(f"Error procesando seguimiento {f.id if hasattr(f, 'id') else 'unknown'}: {fe}")
+                print(
+                    f"Error procesando seguimiento {f.id if hasattr(f, 'id') else 'unknown'}: {fe}"
+                )
                 continue
 
         return {
@@ -103,13 +103,14 @@ def get_dashboard_stats(
             "recent_followups": recent_followups,
             "residence_name": residence_name,
             "user_role": current_user.role,
-            "dynamic_lists_count": 8
+            "dynamic_lists_count": 8,
         }
     except Exception as e:
         import traceback
+
         error_msg = f"ERROR ESTADÍSTICAS DASHBOARD: {str(e)}"
         print(f"{error_msg}\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=error_msg)
+        raise HTTPException(status_code=500, detail=error_msg) from e
 
 
 @router.get("/vaccinations/pending")
@@ -178,25 +179,26 @@ def get_upcoming_birthdays(
                 bday_this_year = res.date_of_birth.replace(year=today.year)
             except ValueError:  # 29 de febrero
                 bday_this_year = res.date_of_birth.replace(year=today.year, day=28)
-            
+
             if bday_this_year < today:
                 try:
                     bday_this_year = res.date_of_birth.replace(year=today.year + 1)
                 except ValueError:
                     bday_this_year = res.date_of_birth.replace(year=today.year + 1, day=28)
-            
+
             days_until = (bday_this_year - today).days
             if days_until <= 30:
-                upcoming.append({
-                    "id": res.id,
-                    "name": f"{res.name} {res.surname}",
-                    "date": res.date_of_birth.strftime("%d/%m"),
-                    "days_until": days_until,
-                    "age": today.year - res.date_of_birth.year
-                })
+                upcoming.append(
+                    {
+                        "id": res.id,
+                        "name": f"{res.name} {res.surname}",
+                        "date": res.date_of_birth.strftime("%d/%m"),
+                        "days_until": days_until,
+                        "age": today.year - res.date_of_birth.year,
+                    }
+                )
 
         return sorted(upcoming, key=lambda x: x["days_until"])
     except Exception as e:
         print(f"ERROR CUMPLEAÑOS: {e}")
         return []
-
