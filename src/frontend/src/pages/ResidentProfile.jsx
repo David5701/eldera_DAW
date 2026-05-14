@@ -500,18 +500,44 @@ function BioDetail({ resident }) {
             </div>
 
             {resident.status !== 'active' && (
-                <div className="mt-6 pt-6 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <InfoRow label="Estado Actual" value={t(resident.status)} />
-                    <InfoRow label="Fecha de Efecto" value={resident.inactive_date ? new Date(resident.inactive_date).toLocaleDateString() : '--'} />
+                <div className="mt-6 pt-6 border-t-2 border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 p-6 rounded-2xl">
+                    <InfoRow label="Estado Actual" value={<span className="font-black uppercase text-indigo-600">{t(resident.status)}</span>} />
+                    
+                    {/* Dynamic Date Label based on Status */}
+                    <InfoRow 
+                        label={
+                            resident.status === 'hospitalized' ? 'Fecha de Ingreso' :
+                            resident.status === 'deceased' ? 'Fecha de Fallecimiento' :
+                            'Fecha de Baja'
+                        }
+                        value={
+                            (resident.status === 'hospitalized' ? resident.hospitalization_date : resident.inactive_date) 
+                                ? new Date(resident.status === 'hospitalized' ? resident.hospitalization_date : resident.inactive_date).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) 
+                                : '--'
+                        } 
+                    />
+
                     {resident.status === 'inactive' && (
                         <InfoRow label="Regreso Previsto" value={resident.return_date ? new Date(resident.return_date).toLocaleDateString() : '--'} />
                     )}
+                    
                     {resident.status === 'deceased' && (
                         <InfoRow label="Lugar de Fallecimiento" value={resident.death_place || '--'} />
                     )}
+                    
+                    {resident.status === 'hospitalized' && (
+                        <InfoRow label="Centro Hospitalario" value={<span className="font-bold text-indigo-700">{resident.hospitalization_hospital || '--'}</span>} />
+                    )}
+
                     <div className="md:col-span-2">
-                        <p className="text-xs font-bold text-slate-500 uppercase mb-1">Motivo / Observaciones</p>
-                        <p className="text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100">{resident.inactive_reason || 'No se registraron observaciones.'}</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                            {resident.status === 'hospitalized' ? 'MOTIVO DEL INGRESO' : 'MOTIVO / OBSERVACIONES'}
+                        </p>
+                        <p className="text-slate-700 bg-white p-4 rounded-xl border border-slate-200 text-sm leading-relaxed shadow-sm italic">
+                            {resident.status === 'hospitalized' 
+                                ? (resident.hospitalization_reason || 'No se registraron observaciones detalladas.') 
+                                : (resident.inactive_reason || 'No se registraron observaciones.')}
+                        </p>
                     </div>
                 </div>
             )}
@@ -1948,19 +1974,23 @@ function ResidentProfile() {
 
                                 {/* Mobile Date Filter (Visible only on small screens for Health/Care) */}
                                 {(activeSection === 'health' || activeSection === 'care') && (
-                                    <div className="lg:hidden px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
-                                        <DateRangeFilter
-                                            startDate={startDate}
-                                            endDate={endDate}
-                                            onStartChange={setStartDate}
-                                            onEndChange={setEndDate}
-                                        />
+                                    <div className="lg:hidden px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+                                        <div className="flex-1 min-w-0">
+                                            <DateRangeFilter
+                                                startDate={startDate}
+                                                endDate={endDate}
+                                                onStartChange={setStartDate}
+                                                onEndChange={setEndDate}
+                                                className="h-11 w-full"
+                                            />
+                                        </div>
                                         <button
                                             onClick={fetchAllData}
-                                            className="h-10 w-10 shrink-0 flex items-center justify-center bg-[#0F172A] text-white rounded-xl shadow-sm active:scale-95 transition-all"
+                                            disabled={loading || vitalsLoading || careLoading}
+                                            className="h-11 w-11 shrink-0 flex items-center justify-center bg-[#0F172A] text-white rounded-xl shadow-md active:scale-95 transition-all hover:bg-slate-800 disabled:opacity-50"
                                             title="Actualizar datos"
                                         >
-                                            <RefreshCw className="w-4 h-4" />
+                                            <RefreshCw className={`w-4 h-4 ${(loading || vitalsLoading || careLoading) ? 'animate-spin' : ''}`} />
                                         </button>
                                     </div>
                                 )}

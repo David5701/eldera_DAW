@@ -12,8 +12,13 @@ export const getBackendUrl = () => {
                    hostname.startsWith('172.');
 
     if (isLocal) {
-        // En eldera-daw académico el puerto ahora es 8085 (para evitar conflictos)
-        return `${protocol}//${hostname}:8085`;
+        // Lógica de detección inteligente de puertos:
+        // 1. Si el frontend corre en el 5180, estamos en DOCKER -> Backend en 8085
+        // 2. Si el frontend corre en el 5173, estamos en MANUAL -> Backend en 8000
+        const { port } = window.location;
+        const backendPort = port === '5180' ? '8085' : '8000';
+        
+        return `${protocol}//${hostname}:${backendPort}`;
     }
 
     // Si hay una URL definida en el entorno (ej. Producción), usarla
