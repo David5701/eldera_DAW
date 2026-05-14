@@ -75,9 +75,7 @@ def health_check(db: Session = Depends(database.get_db)):
             "timestamp": datetime.utcnow(),
         }
     except Exception as e:
-        raise HTTPException(
-            status_code=503, detail=f"Database connection failed: {str(e)}"
-        ) from e
+        raise HTTPException(status_code=503, detail=f"Database connection failed: {str(e)}") from e
 
 
 @app.get("/", tags=["General"])
